@@ -27,7 +27,10 @@ class CustomUserAdmin(admin.ModelAdmin):
     
 
 admin.site.register(Contact, SingletonModelAdmin)
-admin.site.register(Product)
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ("title", "is_active", "price")
+    list_editable = ('is_active', )
 
 
 @admin.register(TelegramUser)
