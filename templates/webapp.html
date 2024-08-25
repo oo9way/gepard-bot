@@ -1,0 +1,505 @@
+<!--
+    Simple static Telegram WebApp. Does not verify the WebAppInitData, as a bot token would be needed for that.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>python-telegram-bot Example WebApp</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<script type="text/javascript">
+    const colorPicker = new iro.ColorPicker('#picker', {
+        borderColor: "#ffffff",
+        borderWidth: 1,
+        width: Math.round(document.documentElement.clientWidth / 2),
+    });
+    colorPicker.on('color:change', function (color) {
+        document.body.style.background = color.hexString;
+    });
+
+    Telegram.WebApp.ready();
+    Telegram.WebApp.MainButton.setText('BUYURTMA BERISH').show().onClick(function () {
+        const data = localStorage.getItem('cart')
+        Telegram.WebApp.sendData(data);
+        Telegram.WebApp.close();
+    });
+</script>
+
+
+<body style="background-color: #f8f9fa">
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Savatcha</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul id="cartList"></ul>
+        </div>
+        <div class="modal-footer">
+            <h3>Umumiy <span id="totalPrice">0</span> so'm</h3>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" id="clearCartButton"><i class="fa fa-trash"></i> Barchasini tozalash</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ortga qaytish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="container" style="margin-bottom: 150px !important;">
+        <div class="header mt-5 mb-4 p-4">
+            <h3>🛍 Brand name</h3>
+        </div>
+
+        <div class="search-bar pt-2">
+            <form action="">
+                <input type="text" class="py-2 px-3" name="q" placeholder="Qidiruv">
+            </form>
+        </div>
+
+        <div class="row mt-1 g-5 p-0">
+            {%for product in products%}
+
+            <div class="col-md-6 col-lg-4 col-sm-12">
+                <div class="card w-100 shadow mb-5 bg-body rounded cart-item" style="height: 100%;">
+                    <img src="https://picsum.photos/400/400" class="card-img-top" alt="">
+                    <div class="card-body">
+                        <h4>{{product.title}}</h4>
+                        <hr class="m-0">
+
+                        <p class="mt-2 mb-2"><b>💰 Narxi: {{product.price}} so'm</b></p>
+                        <p>📝 Izoh: {{product.description}}</p>
+                        <input type="number" name="amount" class="amountOfProduct" placeholder="Mahsulot sonini kiriting">
+                        <div class="btn-group">
+                            <button id="addToCart" data-item-id="{{product.id}}" data-item-name="{{product.title}}" data-item-price="{{product.price}}" class="add-cart btn btn-success">
+                                <i class="fa fa-cart-plus"></i> <span style="display: inline-block; margin-left: 5px;"> Savatga qo'shish</span>
+                            </button>
+                            <button id="deleteFromCart" data-item-id="{{product.id}}" data-item-name="{{product.title}}" data-item-price="{{product.price}}" class="btn btn-danger">
+                                <i class="fa fa-trash"></i> <span style="display: inline-block; margin-left: 5px;">Savatdan olib tashlash</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="footer-block">
+        <button class="open-cart-btn"  id="openModalButton" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <i class="fa fa-shopping-cart" style="font-size: 36px;"></i> <span style="display: inline-block; margin-left: 5px; font-size: 12px;">Savatcha <span id="itemCount">0</span></span>
+        </button>
+    </div> 
+
+   
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        
+
+        // Function to update the cart count display
+        function updateCartCount() {
+            var totalItems = 0;
+            for (var i = 0; i < localStorage.length; i++) {
+                if (localStorage.key(i).startsWith('product_')) {
+                    totalItems += parseInt(localStorage.getItem(localStorage.key(i)), 10);
+                }
+            }
+            document.getElementById('itemCount').textContent = totalItems;
+        }
+
+        // Function to save item count to localStorage
+        function saveItemCount(productId, count) {
+            localStorage.setItem('product_' + productId, count);
+        }
+
+        function increaseQuantity(itemId) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const itemIndex = cart.findIndex(item => item.id === itemId);
+          
+            if (itemIndex !== -1) {
+              cart[itemIndex].qty += 1;
+              localStorage.setItem('cart', JSON.stringify(cart));
+              saveItemCount(itemId, cart[itemIndex].qty);
+              updateCartCount();
+              updateCartDisplay();
+            }
+        }
+
+        // Function to remove an item from the cart
+        function removeItem(productId, productName) {
+            localStorage.removeItem('product_' + productId);
+            
+            // Show Toastify notification
+            Toastify({
+                text: "Mahsulot savatdan olib tashlandi",
+                duration: 2000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#FF0000",
+                stopOnFocus: true
+            }).showToast();
+        }
+          
+        function decreaseQuantity(itemId) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const itemIndex = cart.findIndex(item => item.id === itemId);
+          
+            if (itemIndex !== -1) {
+              if (cart[itemIndex].qty > 1) {
+                cart[itemIndex].qty -= 1;
+              } else {
+                removeItem(itemId)
+                if (cart.length == 1) {
+                    localStorage.removeItem('cart')
+                }else{
+                    console.log("SPLICED")
+                    cart.splice(itemIndex, 1);
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                updateCartDisplay();
+                return
+              }
+              localStorage.setItem('cart', JSON.stringify(cart));
+              saveItemCount(itemId, cart[itemIndex].qty);
+              updateCartCount();
+              updateCartDisplay();
+            }
+        }
+
+        function deleteQuantity(itemId) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const itemIndex = cart.findIndex(item => item.id === itemId);
+            cart.splice(itemIndex, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            removeItem(itemId);
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            const cartList = document.getElementById('cartList');
+            const totalPrice = document.getElementById('totalPrice');
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let total = 0;
+            
+            for (let i = 0; i < cart.length; i++){
+                total = total + (parseInt(cart[i].price) * parseInt(cart[i].qty));
+            }
+
+            totalPrice.innerHTML = total;
+            cartList.innerHTML = cart.map(item => `
+                <li>
+                    <div>
+                        <span>${item.name} (${item.qty}x${item.price} so'm) ${parseInt(item.qty) * parseInt(item.price)} so'm</span>
+                    </div>
+                    <div class="cart-item-buttons">
+                        <button class="counter increase-counter" onclick="decreaseQuantity('${item.id}')">➖</button>
+                        <button class="counter decrease-counter" onclick="increaseQuantity('${item.id}')">➕</button>
+                        <button class="counter delete-counter" onclick="deleteQuantity('${item.id}')">🗑</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Function to get item count from localStorage
+            function getItemCount(productId) {
+                var count = localStorage.getItem('product_' + productId);
+                return count ? parseInt(count, 10) : 0;
+            }
+        
+        
+            // Function to add an item to the cart
+            function addItem(productId, productName, amount, productPrice) {
+                var currentCount = getItemCount(productId);
+                var newCount = currentCount + amount; // Increase the count by the input amount
+                saveItemCount(productId, newCount);
+
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const itemIndex = cart.findIndex(item => item.id === productId);
+
+                if (itemIndex === -1) {
+                    cart.push({ id: productId, name: productName, qty: newCount, price: productPrice });
+                } else {
+                    cart[itemIndex].qty = newCount
+                }
+
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                // Show Toastify notification
+                Toastify({
+                    text: amount + "ta mahsulot savatga qo'shildi",
+                    duration: 2000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#4CAF50",
+                    stopOnFocus: true
+                }).showToast();
+                
+                // Update the item count display
+                updateCartCount();
+                updateCartDisplay();
+            }
+        
+            // Function to clear all items from the cart
+            function clearCart() {
+                localStorage.clear(); // Clear total count from localStorage
+                updateCartCount(); // Update count display
+
+                Toastify({
+                    text: "Savatcha tozalandi",
+                    duration: 2000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#ff006e",
+                    stopOnFocus: true
+                }).showToast();
+
+                updateCartDisplay();
+
+            }
+        
+            // Add event listeners to all "Add to Cart" buttons
+            document.querySelectorAll('.add-cart').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var productId = this.getAttribute('data-item-id');
+                    var productName = this.getAttribute('data-item-name');
+                    var productPrice = this.getAttribute('data-item-price');
+                    var amountInput = this.parentElement.parentElement.querySelector('.amountOfProduct');
+                    var amount = parseInt(amountInput.value, 10) || 0; // Get the amount from the input field
+                    
+                    if (amount > 0) {
+                        addItem(productId, productName, amount, productPrice);
+                        amountInput.value = ''; // Clear the input field after adding
+                    } else {
+                        alert('Please enter a valid amount.');
+                    }
+                });
+            });
+
+            
+
+            // Add event listeners to all "Remove from Cart" buttons
+            document.querySelectorAll('#deleteFromCart').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var productId = this.getAttribute('data-item-id');
+                    var productName = this.getAttribute('data-item-name');
+                    removeItem(productId, productName);
+                    updateCartCount();
+                    updateCartDisplay();
+                });
+            });
+
+
+            document.getElementById('clearCartButton').addEventListener('click', clearCart);
+        
+            // Initialize item count display on page load
+            setTimeout(()=> {
+                updateCartCount();
+                updateCartDisplay();
+            }, 300)
+
+        });
+
+        
+    </script>
+    <style>
+        * {
+            font-family: "Open Sans", sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        .header{
+            background-color: #fff;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 1px 10px 40px 1px #e9ecef;
+            border: 0.3px dashed #adb5bd;
+        }
+        .search-bar{
+            width: 100%;
+        }
+
+        .search-bar input{
+            width: 100%;
+            border: 0.3px solid #dee2e6;
+            border-radius: 10px;
+        }
+        button{
+            transition: transform 0.1s, box-shadow 0.1s;
+            position: relative;
+            overflow: hidden;
+        }
+        button:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+          }
+          
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: width 0.5s, height 0.5s, opacity 0.5s;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+        }
+        
+        button:active::after {
+            width: 0;
+            height: 0;
+            opacity: 1;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            max-height: fit-content;
+        }
+        .card-body input {
+            align-self:stretch;
+            margin-top: auto;
+            margin-bottom: 10px;
+            outline: none;
+            border-radius: 5px;
+            border: 0.8px solid #cbcbcb;
+            padding: 5px 10px;
+        }
+        .card-body p{
+            font-size: 14px;
+            color: #888;
+        }
+
+        .footer-block{
+            position: fixed;
+            bottom: 20px;
+            width: 100px;
+            right: 50px;
+        }
+
+        .open-cart-btn {
+            width: 120px;
+            height: 90px;
+            padding: 15px;
+            border-radius: 30px;
+            background-color: #24A1DE;
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            border: none;
+        }
+
+        .counter {
+            padding: 5px;
+        }
+
+        #cartList {
+            list-style-type: none;
+            padding: 0;
+          }
+          
+        #cartList li {
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            gap: 10px;
+            justify-content: space-between;
+            border-bottom: 0.5px solid #cbcbcb;
+            padding-bottom: 15px;
+        }
+          
+
+        @media screen and (max-width: 600px) {
+            .toastify{
+                max-width: 400px !important;
+                padding: 15px !important;
+                right: 25px !important;
+            }
+            
+            .row{
+                width: 100%;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .card-body{
+                position: relative;
+            }
+            .btn-group{
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                justify-self: end;
+                margin-bottom: 0px;
+            }
+            .btn-group button {
+                border-radius: 5px;
+                margin-top: 5px;
+            }
+        }
+
+        @media screen and (max-width: 560px) {
+            .modal-dialog {
+                margin: 0;
+                height: 100vh;
+            }
+
+            .modal-content {
+                height: 100%;
+            }
+        }
+
+        @media screen and (max-width: 360px) {
+            .toastify{
+                right: 0px !important;
+                display: flex !important;
+                align-items: space-between !important;
+                justify-content: space-between !important;
+                width: 90% !important;
+                left: 2% !important;
+            }
+        }
+
+        
+    </style>
+</body>
+
+<script type="text/javascript">
+    Telegram.WebApp.expand();
+</script>
+</html>
