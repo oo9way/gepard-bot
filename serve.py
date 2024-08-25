@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import django
 
 from fastapi import FastAPI, Request, HTTPException, Query
@@ -54,15 +58,13 @@ async def setup_bot(token: str):
     
     applications[token] = application
 
-    webhook_url = f"https://gp.joseph.uz/webhook?token={token}"
+    webhook_url = f"{os.environ.get("WEBHOOK")}webhook?token={token}"
     await application.bot.set_webhook(url=webhook_url)
 
 
 @app.on_event("startup")
 async def on_startup():
-    bot_tokens = [
-        '7469961928:AAFplfnwrUuojjnjOaw0Cop1eCz1cUtTmkM',
-    ]
+    bot_tokens = os.environ.get("TOKENS").split(",")
     
     for token in bot_tokens:
         await setup_bot(token)
@@ -84,4 +86,4 @@ async def handle_update(request: Request, token: str = Query(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT")))

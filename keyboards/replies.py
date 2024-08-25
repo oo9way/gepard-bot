@@ -1,3 +1,8 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from telegram import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 
 def get_main():
@@ -6,7 +11,7 @@ def get_main():
             [
                 KeyboardButton(
                     text="🛍 Mahsulotlar",
-                    web_app=WebAppInfo(url="https://gpadmin.joseph.uz/webapp"),
+                    web_app=WebAppInfo(url=os.environ.get("WEBAPP")),
                 )
             ],
             [
