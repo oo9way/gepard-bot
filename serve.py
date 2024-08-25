@@ -58,7 +58,7 @@ async def setup_bot(token: str):
     
     applications[token] = application
 
-    webhook_url = f"{os.environ.get("WEBHOOK")}webhook?token={token}"
+    webhook_url = f"{os.environ.get('WEBHOOK')}webhook?token={token}"
     await application.bot.set_webhook(url=webhook_url)
 
 
