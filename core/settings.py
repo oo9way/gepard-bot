@@ -133,7 +133,7 @@ STATICFILES_DIRS = (
 MEDIA_URL = 'media/'
 MEDIA_ROOT = "media"
 
-CSRF_TRUSTED_TOKENS = ['https://gpadmin.joseph.uz']
+CSRF_TRUSTED_ORIGINS = ['https://gpadmin.joseph.uz']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
