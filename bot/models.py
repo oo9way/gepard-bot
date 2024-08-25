@@ -19,20 +19,20 @@ class CustomUser(AbstractUser):
     def save(self, *args, **kwargs):
         call_command('generate_permissions')
 
+        if not self.pk:
+            self.password = make_password(self.password)
+            self.is_active = True
+            self.is_staff = True
+            super().save(*args, **kwargs)
+
         if not self.is_superuser:
             if self.role == "director" or self.role == "accountant":
                 groups = Group.objects.filter(name="default")
                 self.groups.set(groups)
-
             else:
                 groups = Group.objects.filter(name="keeper")
                 self.groups.set(groups)
-
-            if not self.pk:
-                self.password = make_password(self.password)
-                self.is_active = True
-                self.is_staff = True
-        return super().save(*args, **kwargs)
+            
 
     def __str__(self):
         return self.username
