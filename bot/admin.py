@@ -95,6 +95,8 @@ class OrderAdmin(admin.ModelAdmin):
         
         if request.user.role == "storekeeper":
             return ("id", "user", "status", "get_total_cost", "created_at", "accountant_approve_time", "director_approve_time", "storekeeper_approve_time")
+        
+        return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "created_at", "accountant_approve_time", "director_approve_time", "storekeeper_approve_time")
 
         
 
