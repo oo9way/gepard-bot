@@ -6,7 +6,7 @@ def get_main():
             [
                 KeyboardButton(
                     text="🛍 Mahsulotlar",
-                    web_app=WebAppInfo(url="https://0dcf-82-215-111-82.ngrok-free.app/webapp"),
+                    web_app=WebAppInfo(url="https://gpadmin.joseph.uz/webapp"),
                 )
             ],
             [

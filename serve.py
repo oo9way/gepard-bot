@@ -54,15 +54,14 @@ async def setup_bot(token: str):
     
     applications[token] = application
 
-    webhook_url = f"https://webhook.jprq.app/webhook?token={token}"
+    webhook_url = f"https://gp.joseph.uz/webhook?token={token}"
     await application.bot.set_webhook(url=webhook_url)
 
 
 @app.on_event("startup")
 async def on_startup():
     bot_tokens = [
-        '7439028956:AAEtPdKpezLbGAcKb0UbAdZ8l5L8aylj808',
-        '7221386127:AAGa7bBn421GJmIZcQZPoHDnGA-R2pdcs_I',
+        '7469961928:AAFplfnwrUuojjnjOaw0Cop1eCz1cUtTmkM',
     ]
     
     for token in bot_tokens:
@@ -85,4 +84,4 @@ async def handle_update(request: Request, token: str = Query(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=5000)
