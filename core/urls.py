@@ -23,10 +23,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('webapp/', WebAppTemplateView.as_view()),
-    path('', admin.site.urls),
 ]
 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+urlpatterns += [path('', admin.site.urls),]

@@ -131,7 +131,7 @@ STATICFILES_DIRS = (
 )
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = "media"
+MEDIA_ROOT = BASE_DIR / "media"
 
 CSRF_TRUSTED_ORIGINS = ['https://gpadmin.joseph.uz']
 
