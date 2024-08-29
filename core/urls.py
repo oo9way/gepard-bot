@@ -22,10 +22,10 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('webapp/', views.WebAppTemplateView.as_view()),
-    path('v2/', views.WebAppHomePage.as_view(), name="list"),
-    path("v2/<int:pk>/", views.WebAppDetailPage.as_view(), name="detail"),
-    path("v2/cart/", views.WebAppCartPage.as_view(), name="cart")
+    # path('webapp/', views.WebAppTemplateView.as_view()),
+    path('webapp/', views.WebAppHomePage.as_view(), name="list"),
+    path("webapp/<int:pk>/", views.WebAppDetailPage.as_view(), name="detail"),
+    path("webapp/cart/", views.WebAppCartPage.as_view(), name="cart")
 ]
 
 
