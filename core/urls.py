@@ -16,13 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from bot.views import WebAppTemplateView
+from bot import views
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('webapp/', WebAppTemplateView.as_view()),
+    path('webapp/', views.WebAppTemplateView.as_view()),
+    path('v2/', views.WebAppHomePage.as_view(), name="list"),
+    path("v2/<int:pk>/", views.WebAppDetailPage.as_view(), name="detail"),
+    path("v2/cart/", views.WebAppCartPage.as_view(), name="cart")
 ]
 
 
