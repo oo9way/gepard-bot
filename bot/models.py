@@ -70,12 +70,35 @@ class Contact(SingletonModel):
         verbose_name_plural = "Biz bilan bog'laning"
 
 
+class Category(models.Model):
+    cover = models.ImageField("Kategoriya rasmi", upload_to="categories")
+    title = models.CharField("Kategoriya nomi", max_length=255)
+
+    class Meta:
+        verbose_name = "Kategoriya"
+        verbose_name_plural = "Kategoriyalar"
+
+    def __str__(self) -> str:
+        return self.title
+
+
 class Product(models.Model):
     cover = models.ImageField("Mahsulot rasmi", upload_to="products")
     title = models.CharField("Mahsulot nomi", max_length=255)
+    category = models.ForeignKey(
+        Category, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="products", 
+        verbose_name="Kategoriya"
+    )
     description = models.TextField("Izoh")
     is_active = models.BooleanField("Faolmi ?", default=True)
-    price = models.IntegerField("Narxi", default=0)
+    price_uzs = models.IntegerField("Narxi (so'm)", default=0)
+    price_usd = models.IntegerField("Narxi (USD)", default=0)
+    amount = models.IntegerField("Soni", default=0)
+    is_top = models.BooleanField("Ommabop mahsulot", default=False)
 
     class Meta:
         verbose_name = "Mahsulot"

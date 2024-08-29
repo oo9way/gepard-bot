@@ -2,11 +2,16 @@ from collections.abc import Callable, Sequence
 from typing import Any
 from django.contrib import admin
 from django.http import HttpRequest
-from bot.models import TelegramUser, Contact, Product, Order, OrderItem, CustomUser
+from bot.models import TelegramUser, Contact, Product, Order, OrderItem, CustomUser, Category
 from solo.admin import SingletonModelAdmin
 from django.db.models import Sum, F, FloatField
 from django.db.models import Q
 
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("title", "cover")
+    search_fields = ("title",)
 
 
 @admin.register(CustomUser)
@@ -29,7 +34,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 admin.site.register(Contact, SingletonModelAdmin)
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("title", "is_active", "price")
+    list_display = ("title", "is_active", "price_uzs", "price_usd")
     list_editable = ('is_active', )
 
 
