@@ -17,6 +17,12 @@ class WebAppTemplateView(ListView):
             queryset = queryset.filter(title__icontains=query)
         return queryset
     
+    def get_context_data(self, **kwargs: Any):
+        context =  super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        context['top'] = Product.objects.filter(is_top=True)
+        return context
+    
 
 class WebAppHomePage(ListView):
     model = Product
@@ -37,8 +43,17 @@ class WebAppHomePage(ListView):
         return context
 
 
+class WebAppCategoryPage(ListView):
+    model = Product
+    context_object_name = "products"
+    template_name = "category.html"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        category = self.request.GET.get("cat")
+        return super().get_queryset().filter(category_id=category)
+
 class WebAppDetailPage(DetailView):
-    template_name = "app/product-detail.html"
+    template_name = "single.html"
     model = Product
 
 
