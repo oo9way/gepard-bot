@@ -87,27 +87,8 @@
             </form>
         </div>
 
-        <div class="slides p-3 python-telegram-bot">
-            <img src="https://imageproxy.wolt.com/venue/6336c2b2024e8571a2c65fec/90652c6e-5526-11ed-adc2-7abc906c76fb_img_2440.jpg" alt="" class="slider">
-        </div>
-
-        <div class="categories mt-2 p-3">
-            <div class="title pb-2">Категории</div>
-            <div class="row mt-2">
-                {% for category in categories %}
-                    <div class="col-sm-3 col-3">
-                        <a href="{% url "by_category" %}?cat={{category.id}}" class="link">
-                            <div class="cat-cover mb-1">
-                                <img src="{{category.cover.url}}" alt="">
-                            </div>
-                            <div class="sub-title">
-                                {{category.title}}
-                            </div>
-                        </a>
-                    </div>
-                {% endfor %}
-                
-            </div>
+        <div class="p-2 w-100">
+            <a href="{% url "list" %}" class="link">Главное меню</a>
         </div>
 
         <div class="products mt-2 p-3">
