@@ -1,4 +1,6 @@
 {% load static %}
+{% load humanize %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,18 +46,18 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Savatcha</h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Корзина</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <ul id="cartList"></ul>
         </div>
         <div class="modal-footer">
-            <h3>Umumiy <span id="totalPrice">0</span> so'm</h3>
+            <h3>Общий <span id="totalPrice">0</span> сум</h3>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-danger" id="clearCartButton"><i class="fa fa-trash"></i> Barchasini tozalash</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ortga qaytish</button>
+            <button type="button" class="btn btn-danger" id="clearCartButton"><i class="fa fa-trash"></i> Очистить корзину</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Назад</button>
         </div>
       </div>
     </div>
@@ -83,7 +85,7 @@
                 </div>
             </div>
             <form action="">
-                <input type="text" class="py-2 px-3 search-bar" name="q" placeholder="Qidiruv">
+                <input type="text" class="py-2 px-3 search-bar" name="q" placeholder="Поиск">
             </form>
         </div>
 
@@ -104,9 +106,9 @@
             </div>
 
             <ul class="product-prices-single">
-                <li>$ {{product.price_usd}}</li>
+                <li>$ {{product.price_usd|intcomma}}</li>
 
-                <li>{{product.price_uzs}} so'm</li>
+                <li>{{product.price_uzs|intcomma}} сум</li>
             </ul>
             <div class="product-description">
                 {{product.description}}
@@ -131,9 +133,20 @@
                 <div class="col-6"><b>Число:</b></div>
                 <div class="col-6">
                     <div class="counter-group">
+                        <input type="hidden" name="productSingleId" class="productSingleId" value="{{product.id}}">
+                        <input type="hidden" name="productName" class="productName" value="{{product.title}}">
+                        <input type="hidden" name="productPriceUzs" class="productPriceUzs" value="{{product.price_uzs}}">
+                        <input type="hidden" name="productCover" class="productCover" value="{{product.cover.url}}">
+                        <input type="hidden" name="productPriceUsd" class="productPriceUsd" value="{{product.price_usd}}">
                         <button onclick="decreaseQuantity('{{product.id}}')">-</button>
-                        <input type="text" class="amountOfProduct" readonly value="0">
-                        <button data-item-id="{{product.id}}" data-item-name="{{product.title}}" data-item-price="{{product.price_uzs}}" class="add-cart">+</button>
+                        <input type="text" class="amountOfProduct" value="0">
+                        <button 
+                            data-item-id="{{product.id}}" 
+                            data-item-name="{{product.title}}" 
+                            data-item-price-uzs="{{product.price_uzs}}" 
+                            data-item-price-usd="{{product.price_usd}}"
+                            data-item-cover="{{product.cover.url}}"
+                            class="add-cart">+</button>
                     </div>
                 </div>
             </div>
@@ -144,11 +157,10 @@
                 </div>
                 <div class="col-6 align-right">
                     <div>$ <span id="totalSinglePriceUsd">0</span></div>
-                    <div><span id="totalSinglePriceUzs">0</span> so'm</div>
+                    <div><span id="totalSinglePriceUzs">0</span> сум</div>
                 </div>
             </div>
         </div>
-
       
     </div>
 

@@ -218,6 +218,27 @@
 
 .modal-content {
     border: none;
+    background-color: #f5f5fa;
+}
+
+.modal-body{
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.modal-header{
+    background-color: white;
+}
+
+.cart-modal-item{
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.total-text{
+    display: flex;
+    align-items: end;
 }
 
 .counter {
@@ -226,7 +247,7 @@
 
 .counter-group{
     display: grid;
-    grid-template-columns: 50px 50px 50px;
+    grid-template-columns: 50px 100px 50px;
     grid-template-rows: 50px;
     gap: 5px;
     justify-content: end;
@@ -258,6 +279,7 @@
     border: 1px solid #888;
     text-align: center;
     height: 50px;
+    width: 100px !important;
 }
 
 .align-right{
@@ -266,6 +288,93 @@
 
 .counter-group input{
     width: auto;
+}
+
+
+.cart-counter-group{
+    display: grid;
+    grid-template-columns: auto 30px 50px 30px;
+    grid-template-rows: 50px;
+}
+
+.cart-product-usd{
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+.cart-product-uzs {
+    font-size: 14px;
+    color: #555;
+}
+
+.cart-delete-btn{
+    background-color: white;
+    border: 1px solid #f13e47;
+    border-radius: 5px;
+    padding: 10px;
+    color: #f13e47;
+}
+
+.cart-delete-btn:hover{
+    background-color: #f13e47;
+    color: white;
+    transition: 0.5s ease;
+}
+
+.cart-product-cover{
+    border-radius: 10px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+
+}
+
+.total-prices{
+    text-align: right;
+    padding-right: 5px;
+    margin-top: -5px;
+    font-size: 14px;
+}
+
+.cart-counter-group{
+    display: flex;
+    align-items: flex-start;
+    justify-content: end;
+    gap: 5px;
+}
+
+.cart-counter-group button {
+    height: 40px;
+    width: 40px;
+    background-color: white;
+    border: 2px solid #24A1DE;
+    color: #24A1DE;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.cart-counter-group input {
+    font-size: 12px;
+    margin: 0;
+    text-align: center;
+    padding: 0;
+    height: 40px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.total-prices div {
+    padding: 0;
+    margin: 0;
+}
+
+.total-prices div:first-child{
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.total-prices div:last-child{
+    margin-top: -5px;
 }
 
 #cartList {
@@ -342,5 +451,13 @@
         justify-content: space-between !important;
         width: 90% !important;
         left: 2% !important;
+    }
+}
+
+
+@media screen and (min-width:560px) {
+    .cart-modal-item {
+        width: 100%;
+        margin-left: 0px;
     }
 }

@@ -44,18 +44,18 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Savatcha</h1>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Корзина</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <ul id="cartList"></ul>
         </div>
         <div class="modal-footer">
-            <h3>Umumiy <span id="totalPrice">0</span> so'm</h3>
+            <h3>Общий <span id="totalPrice">0</span> сум</h3>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-danger" id="clearCartButton"><i class="fa fa-trash"></i> Barchasini tozalash</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ortga qaytish</button>
+            <button type="button" class="btn btn-danger" id="clearCartButton"><i class="fa fa-trash"></i> Очистить корзину</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Назад</button>
         </div>
       </div>
     </div>
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <form action="">
-                <input type="text" class="py-2 px-3 search-bar" name="q" placeholder="Qidiruv">
+                <input type="text" class="py-2 px-3 search-bar" name="q" placeholder="Поиск">
             </form>
         </div>
 
@@ -105,7 +105,7 @@
                             </div>
                             <div class="product-details">
                                 <ul class="product-prices">
-                                    <li>{{product.price_uzs}} so'm</li>
+                                    <li>{{product.price_uzs}} сум</li>
                                     <li>$ {{product.price_usd}}</li>
                                 </ul>
                                 <img src="{% static 'assets/png/backet.png' %}" alt="">
