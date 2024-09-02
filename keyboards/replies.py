@@ -10,15 +10,15 @@ def get_main():
         [
             [
                 KeyboardButton(
-                    text="🛍 Mahsulotlar",
+                    text="🛍 Продукты",
                     web_app=WebAppInfo(url=os.environ.get("WEBAPP")),
                 )
             ],
             [
-                KeyboardButton(text="📞 Biz bilan bog'laning")
+                KeyboardButton(text="📞 Связаться с нами")
             ],
             [
-                KeyboardButton(text="⚙️ Sozlamalar")
+                KeyboardButton(text="⚙️ Настройки")
             ]
 
         ],

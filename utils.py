@@ -15,14 +15,15 @@ def get_user(handler):
         }
 
         try:
-            user = await TelegramUser.objects.aget(telegram_id=user.id)
+            user = await TelegramUser.objects.prefetch_related("territory").aget(telegram_id=user.id)
             user.username = user_data.get("username", "")
             if not user.is_updated:
                 user.first_name = user_data.get("first_name", "")
                 user.last_name = user_data.get("last_name", "")
 
             await user.asave()
-        except:
+        except Exception as e:
+            print(e)
             user = await TelegramUser.objects.acreate(**user_data)
         
         return await handler(update, context, user, *args, **kwargs)
