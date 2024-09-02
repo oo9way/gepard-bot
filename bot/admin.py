@@ -2,10 +2,17 @@ from collections.abc import Callable, Sequence
 from typing import Any
 from django.contrib import admin
 from django.http import HttpRequest
-from bot.models import TelegramUser, Contact, Product, Order, OrderItem, CustomUser, Category
+from bot.models import TelegramUser, Contact, Product, Order, OrderItem, CustomUser, Category, Area, ClientCategory
 from solo.admin import SingletonModelAdmin
 from django.db.models import Sum, F, FloatField
 from django.db.models import Q
+from django.utils.html import format_html
+
+
+@admin.register(ClientCategory)
+class ClientCategoryAdmin(admin.ModelAdmin):
+    list_display = ("id", "name")
+    search_fields = ("name", )
 
 
 @admin.register(Category)
@@ -40,10 +47,11 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(TelegramUser)
 class TelegramUserAdmin(admin.ModelAdmin):
-    list_display = ("id", "first_name", "last_name", "username", "is_agent", "phone")
+    list_display = ("id", "first_name", "last_name", "username", "is_agent", "phone", "category")
     list_display_links = ("id", "first_name", "last_name")
     list_editable = ("is_agent", )
     readonly_fields = ("telegram_id", "first_name", "last_name", "username", "phone")
+
 
 class OrderItemTabularInline(admin.TabularInline):
     model = OrderItem
@@ -93,18 +101,33 @@ class OrderAdmin(admin.ModelAdmin):
 
     def get_list_display(self, request):
         if request.user.role == "accountant":
-            return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "created_at", "accountant_approve_time", "director_approve_time", "storekeeper_approve_time")
+            return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
         
         if request.user.role == "director":
-            return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "created_at", "accountant_approve_time", "director_approve_time", "storekeeper_approve_time")
+            return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
         
         if request.user.role == "storekeeper":
-            return ("id", "user", "status", "get_total_cost", "created_at", "accountant_approve_time", "director_approve_time", "storekeeper_approve_time")
+            return ("id", "user", "status", "get_total_cost", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
         
-        return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "created_at", "accountant_approve_time", "director_approve_time", "storekeeper_approve_time")
+        return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
 
-        
+    def get_accountant_approve_time(self, obj):
+        return format_html(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.accountant_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.accountant_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
 
+    get_accountant_approve_time.short_description = "Бухгалтер"
+
+    def get_director_approve_time(self, obj):
+        return format_html(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.director_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.director_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
+
+
+    get_director_approve_time.short_description = "Директор"
+
+    def get_storekeeper_approve_time(self, obj):
+        return format_html(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.storekeeper_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.storekeeper_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
+
+
+    get_storekeeper_approve_time.short_description = "Кладовщик"
+    
     def formfield_for_choice_field(self, db_field, request, **kwargs):
         if db_field.name == 'status':
             if request.user.role == "accountant":
@@ -118,7 +141,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = queryset.annotate(total_price=Sum(F('items__price') * F('items__qty'), output_field=FloatField()))
+        queryset = queryset.annotate(total_price=Sum(F('items__price_uzs') * F('items__qty'), output_field=FloatField()))
         if request.user.role == "director":
             queryset = queryset.exclude(status="pending")
 
@@ -137,3 +160,9 @@ class OrderAdmin(admin.ModelAdmin):
         return obj.total_price if obj.total_price else 0
     
     get_total_cost.short_description = "Umumiy summa"
+
+
+@admin.register(Area)
+class AreaAdmin(admin.ModelAdmin):
+    list_display = ("id", "name",)
+    search_fields = ("name",)

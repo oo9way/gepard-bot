@@ -6,7 +6,7 @@ load_dotenv()
 import django
 
 from fastapi import FastAPI, Request, HTTPException, Query
-from telegram.ext import Application, CommandHandler, ConversationHandler, MessageHandler, filters
+from telegram.ext import Application, CommandHandler, ConversationHandler, MessageHandler, filters, CallbackQueryHandler
 from telegram import Update, ReplyKeyboardMarkup
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
@@ -39,7 +39,7 @@ async def handle_reply(update, context):
 
 conversation_handler = ConversationHandler(
     entry_points=[
-        MessageHandler(filters.Text("⚙️ Sozlamalar"), parameters.get_parameters)
+        MessageHandler(filters.Text("⚙️ Настройки"), parameters.get_parameters)
     ],
     states={
         states.GET_SETTING: [MessageHandler(filters.TEXT, parameters.get_setting)],
@@ -49,17 +49,34 @@ conversation_handler = ConversationHandler(
     fallbacks=[]
 )
 
+order_handler = ConversationHandler(
+    entry_points=[
+        MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web.web_app_data)
+    ],
+    states={
+        states.CHOOSE_CLIENT: [
+            CallbackQueryHandler(web.get_client),
+        ],
+        states.CHOOSE_PAYMENT: [
+            CallbackQueryHandler(web.get_payment)
+        ]
+    },
+    fallbacks=[
+        CommandHandler("start", commands.start)
+    ]
+)
+
 async def setup_bot(token: str):
     application = Application.builder().token(token).build()
     application.add_handler(CommandHandler("start", commands.start))
-    application.add_handler(MessageHandler(filters.Text("📞 Biz bilan bog'laning"), common.contact))
+    application.add_handler(MessageHandler(filters.Text("📞 Связаться с нами"), common.contact))
     application.add_handler(conversation_handler)
-    application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web.web_app_data))
+    application.add_handler(order_handler)
     
     applications[token] = application
 
     webhook_url = f"{os.environ.get('WEBHOOK')}webhook?token={token}"
-    await application.bot.set_webhook(url=webhook_url)
+    # await application.bot.set_webhook(url=webhook_url)
 
 
 @app.on_event("startup")
@@ -72,6 +89,7 @@ async def on_startup():
 
 @app.post("/webhook")
 async def handle_update(request: Request, token: str = Query(...)):
+    print(applications)
     if token not in applications:
         raise HTTPException(status_code=404, detail="Invalid bot token")
 
