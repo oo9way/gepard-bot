@@ -1,8 +1,9 @@
 from typing import Any
 from django.db.models.query import QuerySet
 from django.views.generic import TemplateView, ListView, DetailView
-from bot.models import Product, Category
-from django.db.models import Q
+from bot.models import Product, Category, TelegramUser
+from django.db.models import Q, F
+
 
 
 class WebAppTemplateView(ListView):
@@ -13,12 +14,35 @@ class WebAppTemplateView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         query = self.request.GET.get('q')
+        user_id= self.request.GET.get("user_id", None)
+
         if query:
             queryset = queryset.filter(title__icontains=query)
+        
+        if user_id and user_id != "None":
+            category = TelegramUser.objects.get(pk=user_id).category
+
+            if category:
+                if category.action == "increase":
+                    queryset = queryset.extra(
+                        select={
+                            'price_uzs': f'price_uzs + {float(category.amount_uzs)}',
+                            'price_usd': f'price_usd + {float(category.amount_usd)}'
+                        }
+                    )
+                elif category.action == "decrease":
+                    queryset = queryset.extra(
+                        select={
+                            'price_uzs': f'price_uzs - {float(category.amount_uzs)}',
+                            'price_usd': f'price_usd - {float(category.amount_usd)}'
+                        }
+                    )
+
         return queryset
     
     def get_context_data(self, **kwargs: Any):
         context =  super().get_context_data(**kwargs)
+        context['user_id'] = self.request.GET.get("user_id", None)
         context['categories'] = Category.objects.all()
         context['top'] = Product.objects.filter(is_top=True)
         return context
@@ -50,11 +74,70 @@ class WebAppCategoryPage(ListView):
 
     def get_queryset(self) -> QuerySet[Any]:
         category = self.request.GET.get("cat")
-        return super().get_queryset().filter(category_id=category)
+        queryset = super().get_queryset().filter(category_id=category)
+        user_id = self.request.GET.get("user_id", None)
+
+        if user_id and user_id != "None":
+            category = TelegramUser.objects.get(pk=user_id).category
+
+            if category:
+                if category.action == "increase":
+                    queryset = queryset.extra(
+                        select={
+                            'price_uzs': f'price_uzs + {float(category.amount_uzs)}',
+                            'price_usd': f'price_usd + {float(category.amount_usd)}'
+                        }
+                    )
+                elif category.action == "decrease":
+                    queryset = queryset.extra(
+                        select={
+                            'price_uzs': f'price_uzs - {float(category.amount_uzs)}',
+                            'price_usd': f'price_usd - {float(category.amount_usd)}'
+                        }
+                    )
+
+        return queryset
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['user_id'] = self.request.GET.get("user_id", None)
+        return context
+    
 
 class WebAppDetailPage(DetailView):
     template_name = "single.html"
     model = Product
+
+    def get_queryset(self) -> QuerySet[Any]:
+        user_id = self.request.GET.get("user_id", None)
+        queryset = super().get_queryset()
+
+        if user_id and user_id != "None":
+            category = TelegramUser.objects.get(pk=user_id).category
+
+            if category:
+                if category.action == "increase":
+                    queryset = queryset.extra(
+                        select={
+                            'price_uzs': f'price_uzs + {float(category.amount_uzs)}',
+                            'price_usd': f'price_usd + {float(category.amount_usd)}'
+                        }
+                    )
+                elif category.action == "decrease":
+                    queryset = queryset.extra(
+                        select={
+                            'price_uzs': f'price_uzs - {float(category.amount_uzs)}',
+                            'price_usd': f'price_usd - {float(category.amount_usd)}'
+                        }
+                    )
+
+        return queryset
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['user_id'] = self.request.GET.get("user_id", None)
+        return context
+
 
 
 class WebAppCartPage(TemplateView):

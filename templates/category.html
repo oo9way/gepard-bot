@@ -82,12 +82,13 @@
                 </div>
             </div>
             <form action="">
+                <input type="hidden" name="user_id" value="{{user_id}}">
                 <input type="text" class="py-2 px-3 search-bar" name="q" placeholder="Поиск">
             </form>
         </div>
 
         <div class="p-2 w-100">
-            <a href="{% url "list" %}" class="link">Главное меню</a>
+            <a href="{% url "list" %}?user_id={{user_id}}" class="link">Главное меню</a>
         </div>
 
         <div class="products mt-2 p-3">
@@ -95,7 +96,7 @@
             <div class="row mt-2">
                 {% for product in products %}
                     <div class="col-sm-6 p-2 col-6 m-0 p-0">
-                        <a href="{% url "detail" product.id %}" class="link">
+                        <a href="{% url "detail" product.id %}?user_id={{user_id}}" class="link">
                             <div class="cat-cover mb-1">
                                 <img src="{{product.cover.url}}" alt="">
                             </div>

@@ -5,7 +5,7 @@ from keyboards import replies
 
 @get_user
 async def start(update, context, user):
-    message = "Assalamu alaykum, botimizga xush kelibsiz. \nKerakli xizmatni tanlang."
+    message = "Здравствуйте, добро пожаловать в наш бот. \nВыберите нужную услугу."
 
     if user.is_agent:
         return await update.message.reply_text(

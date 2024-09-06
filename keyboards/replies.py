@@ -5,13 +5,13 @@ load_dotenv()
 
 from telegram import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 
-def get_main():
+def get_main(user_id=None):
     return ReplyKeyboardMarkup(
         [
             [
                 KeyboardButton(
                     text="🛍 Продукты",
-                    web_app=WebAppInfo(url=os.environ.get("WEBAPP")),
+                    web_app=WebAppInfo(url=os.environ.get("WEBAPP") + f"?user_id={user_id}" if user_id else ""),
                 )
             ],
             [
