@@ -7,7 +7,10 @@ from keyboards import replies
 async def start(update, context, user):
     message = "Assalamu alaykum, botimizga xush kelibsiz. \nKerakli xizmatni tanlang."
 
-    await update.message.reply_text(
-        message,
-        reply_markup=replies.get_main(),
-    )
+    if user.is_agent:
+        return await update.message.reply_text(
+            message, reply_markup=replies.get_agent_main()
+        )
+    return await update.message.reply_text(message,reply_markup=replies.get_main())
+    
+    

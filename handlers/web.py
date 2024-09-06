@@ -49,53 +49,72 @@ async def web_app_data(update: Update, context: CallbackContext, user: TelegramU
 
     if order_items:
         await OrderItem.objects.abulk_create(order_items)
+    
+    context.user_data["uncompleted_order_id"] = order.pk
     territories = await sync_to_async(user.territory.all)()
     clients = await fetch_clients(territories)
     if not clients:
         message = "Заказ отменен, так как у вас нет клиентов"
         await order.adelete()
-        await update.message.reply_text(message, reply_markup=replies.get_main())
+        await update.message.reply_text(message, reply_markup=replies.get_agent_main())
+        return -1
+
+    if not context.user_data.get("client_for_order"):
+        message = "Выберите клиента"
+        await update.message.reply_text(message, reply_markup=inlines.get_user_inline_keyboard(clients))
+        
+        return states.CHOOSE_CLIENT
+    
+    client = await TelegramUser.objects.aget(id=context.user_data.get("client_id_for_order"))
+    order.user = client
+    order.agent = user
+    await order.asave()
+    
+    del context.user_data["client_for_order"]
+    del context.user_data["client_id_for_order"]
+
+    message = "Выберите тип оплаты"
+    await update.message.reply_text(message, reply_markup=inlines.create_payment_keyboard())
+    return states.CHOOSE_PAYMENT
+
+
+@get_user
+async def get_agent_client(update, context, user):
+    territories = await sync_to_async(user.territory.all)()
+    clients = await fetch_clients(territories)
+    if not clients:
+        message = "У вас нет клиентов"
+        await update.message.reply_text(message, reply_markup=replies.get_agent_main())
         return -1
 
     message = "Выберите клиента"
     await update.message.reply_text(message, reply_markup=inlines.get_user_inline_keyboard(clients))
+    context.user_data["client_for_order"] = True
 
-
-    context.user_data["uncompleted_order_id"] = order.pk
     return states.CHOOSE_CLIENT
-
-    # message = "<b>📦 Buyurtma muvaffaqiyatli berildi.</b> \n"
-    # message += "📄 Buyurtma holati: <b>Kutilmoqda </b>\n\n"
-    # message += "====================================\n\n"
-    # total_price = 0
-    # for idx, item in enumerate(order_items):
-    #     total_price += int(item.qty) * int(item.price)
-    #     message += f"<b>{idx + 1}. {item.product_name} ({item.qty}x{item.price} so'm)</b>\n"
-
-    # message += "\n====================================\n\n"
-    # message += f"<b>💰 Umumiy {total_price} so'm</b>"
-    
-
-    # await update.message.reply_html(
-    #     text=message,
-    #     reply_markup=replies.get_main(),
-    # )
 
 
 @get_user
 async def get_client(update: Update, context: CallbackContext, user:TelegramUser) -> None:
     data = update.callback_query.data
+    await update.callback_query.answer()
+    await update.callback_query.delete_message()
+
     client_id = data.split("_")[1]
     client = await TelegramUser.objects.aget(id=client_id)
+    if context.user_data.get("client_for_order"):
+        context.user_data['client_id_for_order'] = client_id
+        message = "Выберите желаемую услугу"
+        await update.callback_query.message.reply_text(message, reply_markup=replies.get_main())
+        return -1
+
     order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
     order.user = client
     order.agent = user
     order.asave()
 
-    await update.callback_query.answer()
     message = "Выберите тип оплаты"
     await update.callback_query.message.reply_text(message, reply_markup=inlines.create_payment_keyboard())
-    await update.callback_query.delete_message()
     return states.CHOOSE_PAYMENT
 
 
@@ -104,13 +123,12 @@ async def get_payment(update: Update, context: CallbackContext, user:TelegramUse
     data = update.callback_query.data
     order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
     order.payment_type = data
-    print(order.id, "OOOOOOEEEERRRDERRR")
     await order.asave()
     await update.callback_query.delete_message()
 
 
     message = "Заказ выполнен успешно"
-    await update.callback_query.message.reply_text(message)
+    await update.callback_query.message.reply_text(message, reply_markup=replies.get_agent_main())
     return -1
 
 
