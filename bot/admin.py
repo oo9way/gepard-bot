@@ -50,7 +50,7 @@ class TelegramUserAdmin(admin.ModelAdmin):
     list_display = ("id", "first_name", "last_name", "username", "is_agent", "phone", "category")
     list_display_links = ("id", "first_name", "last_name")
     list_editable = ("is_agent", )
-    readonly_fields = ("telegram_id", "first_name", "last_name", "username", "phone")
+    readonly_fields = ("telegram_id", "username",)
 
 
 class OrderItemTabularInline(admin.TabularInline):
