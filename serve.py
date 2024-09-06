@@ -51,7 +51,8 @@ conversation_handler = ConversationHandler(
 
 order_handler = ConversationHandler(
     entry_points=[
-        MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web.web_app_data)
+        MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web.web_app_data),
+        MessageHandler(filters.Text("🛍 Продукты"), web.get_agent_client)
     ],
     states={
         states.CHOOSE_CLIENT: [

@@ -25,6 +25,25 @@ def get_main():
         resize_keyboard=True,
     )
 
+def get_agent_main():
+    return ReplyKeyboardMarkup(
+        [
+            [
+                KeyboardButton(
+                    text="🛍 Продукты",
+                )
+            ],
+            [
+                KeyboardButton(text="📞 Связаться с нами")
+            ],
+            [
+                KeyboardButton(text="⚙️ Настройки")
+            ]
+
+        ],
+        resize_keyboard=True,
+    )
+
 
 
 def get_settings():
