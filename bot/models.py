@@ -39,11 +39,21 @@ class CustomUser(AbstractUser):
 
 
 class ClientCategory(models.Model):
+    class ActionTypes(models.TextChoices):
+        INCREASE = "increase", "Добавлять"
+        DECREASE = "decrease", "Вычесть"
+
     name = models.CharField("Название", max_length=255)
+    action = models.CharField("Добавить/вычесть цену", choices=ActionTypes.choices, default=ActionTypes.INCREASE, max_length=255)
+    amount_uzs = models.CharField("Сумма UZS", max_length=255)
+    amount_usd = models.CharField("Сумма USD", max_length=255)
 
     class Meta:
         verbose_name = "Категория клиента"
         verbose_name_plural = "Категории клиентов"
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class TelegramUser(models.Model):
@@ -104,14 +114,17 @@ class Product(models.Model):
     )
     description = models.TextField("Комментарий")
     is_active = models.BooleanField("Активен", default=True)
-    price_uzs = models.IntegerField("Цена (сум)", default=0)
-    price_usd = models.IntegerField("Цена (долл. США)", default=0)
+    price_uzs = models.FloatField("Цена (сум)", default=0)
+    price_usd = models.FloatField("Цена (долл. США)", default=0)
     amount = models.IntegerField("Число", default=0)
     is_top = models.BooleanField("Популярный продукт", default=False)
 
     class Meta:
         verbose_name = "Продукт"
         verbose_name_plural = "Продукты"
+
+    def __str__(self) -> str:
+        return self.title
 
 
 

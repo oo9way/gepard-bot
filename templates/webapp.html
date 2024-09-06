@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>python-telegram-bot Example WebApp</title>
+    <title>Shop</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -19,15 +19,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 </head>
 <script type="text/javascript">
-    const colorPicker = new iro.ColorPicker('#picker', {
-        borderColor: "#ffffff",
-        borderWidth: 1,
-        width: Math.round(document.documentElement.clientWidth / 2),
-    });
-    colorPicker.on('color:change', function (color) {
-        document.body.style.background = color.hexString;
-    });
-
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setText('BUYURTMA BERISH').show().onClick(function () {
         const data = localStorage.getItem('cart');
@@ -87,6 +78,7 @@
                 </div>
             </div>
             <form action="">
+                <input type="hidden" name="user_id" value="{{user_id}}">
                 <input type="text" class="py-2 px-3 search-bar" name="q" placeholder="Поиск">
             </form>
         </div>
@@ -100,7 +92,7 @@
             <div class="row mt-2">
                 {% for category in categories %}
                     <div class="col-sm-3 col-3">
-                        <a href="{% url "by_category" %}?cat={{category.id}}" class="link">
+                        <a href="{% url "by_category" %}?cat={{category.id}}&user_id={{user_id}}" class="link">
                             <div class="cat-cover mb-1">
                                 <img src="{{category.cover.url}}" alt="">
                             </div>
@@ -119,7 +111,7 @@
             <div class="row mt-2">
                 {% for product in products %}
                     <div class="col-sm-6 p-2 col-6 m-0 p-0">
-                        <a href="{% url "detail" product.id %}" class="link">
+                        <a href="{% url "detail" product.id %}?user_id={{user_id}}" class="link">
                             <div class="cat-cover mb-1">
                                 <img src="{{product.cover.url}}" alt="">
                             </div>

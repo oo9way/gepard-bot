@@ -84,13 +84,11 @@
                     <span class="cart-counter" id="itemCount"></span>
                 </div>
             </div>
-            <form action="">
-                <input type="text" class="py-2 px-3 search-bar" name="q" placeholder="Поиск">
-            </form>
+         
         </div>
 
         <div class="p-2 w-100">
-            <a href="{% url "list" %}" class="link">Главное меню</a>
+            <a href="{% url "list" %}?user_id={{user_id}}" class="link">Главное меню</a>
         </div>
 
         <div class="products mt-2 p-3">

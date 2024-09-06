@@ -105,7 +105,7 @@ async def get_client(update: Update, context: CallbackContext, user:TelegramUser
     if context.user_data.get("client_for_order"):
         context.user_data['client_id_for_order'] = client_id
         message = "Выберите желаемую услугу"
-        await update.callback_query.message.reply_text(message, reply_markup=replies.get_main())
+        await update.callback_query.message.reply_text(message, reply_markup=replies.get_main(client_id))
         return -1
 
     order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
