@@ -164,6 +164,7 @@ class Order(models.Model):
     payment_type = models.CharField("Тип платежа", choices=PaymentTypes.choices, null=True, blank=True, max_length=16)
     status = models.CharField("Статус заказа", max_length=24, choices=OrderStatus.choices, default=OrderStatus.PENDING)
     created_at = models.DateTimeField("Время размещения заказа", auto_now=True)
+    location_path = models.URLField("Место доставки", null=True, blank=True)
     accountant_approve_time = models.DateTimeField("Время утверждения бухгалтером", null=True, blank=True)
     director_approve_time = models.DateTimeField("Время утверждения директором", null=True, blank=True)
     storekeeper_approve_time = models.DateTimeField("Время одобрения кладовщика", null=True, blank=True)

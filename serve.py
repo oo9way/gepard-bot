@@ -60,6 +60,9 @@ order_handler = ConversationHandler(
         ],
         states.CHOOSE_PAYMENT: [
             CallbackQueryHandler(web.get_payment)
+        ],
+        states.CHOOSE_LOCATION:[
+            MessageHandler(filters.ALL, web.get_location)
         ]
     },
     fallbacks=[
