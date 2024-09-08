@@ -126,10 +126,28 @@ async def get_payment(update: Update, context: CallbackContext, user:TelegramUse
     await order.asave()
     await update.callback_query.delete_message()
 
+    message = "Выберите адрес доставки"
+    await update.callback_query.message.reply_text(message, reply_markup=replies.get_location())
+    return states.CHOOSE_LOCATION
 
-    message = "Заказ выполнен успешно"
-    await update.callback_query.message.reply_text(message, reply_markup=replies.get_agent_main())
-    return -1
 
-
+@get_user
+async def get_location(update: Update, context: CallbackContext, user:TelegramUser):
+    if update.message and update.message.location:
+        location = update.message.location
+        longitude = location.longitude
+        latitude = location.latitude
+        location_path = f"https://yandex.com/maps/?pt={longitude},{latitude}&z=15&l=map"
+        print(location_path)
+        order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
+        order.location_path = location_path
+        await order.asave()
+        message = "Заказ выполнен успешно"
+        await update.message.reply_text(message, reply_markup=replies.get_agent_main())
+        return -1
     
+    message = "Пожалуйста, отправьте местоположение с помощью кнопки"
+    
+    await update.message.reply_text(message, reply_markup=replies.get_location())
+    return states.CHOOSE_LOCATION
+

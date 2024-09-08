@@ -44,6 +44,19 @@ def get_agent_main():
         resize_keyboard=True,
     )
 
+def get_location():
+    return ReplyKeyboardMarkup(
+        [
+            [
+                KeyboardButton(
+                    text="📍 Отправить местоположение",
+                    request_location=True
+                )
+            ]
+        ],
+        resize_keyboard=True
+    )
+
 
 
 def get_settings():
