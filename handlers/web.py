@@ -137,7 +137,6 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
         location = update.message.location
         longitude = location.longitude
         latitude = location.latitude
-        location_path = f"https://yandex.com/maps/?pt={longitude},{latitude}&z=15&l=map"
         location_path = f"https://www.google.com/maps?q={longitude},{latitude}&ll={longitude},{latitude}&z=16"
         print(location_path)
         order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
