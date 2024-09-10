@@ -15,7 +15,7 @@ from django.db.models import Q
 
 async def fetch_clients(territories):
     # Wrap the ORM operation with sync_to_async
-    return await sync_to_async(lambda: list(TelegramUser.objects.filter(territory__in=territories, is_agent=False)))()
+    return await sync_to_async(lambda: list(TelegramUser.objects.filter(territory__in=territories, is_agent=False, is_active=True)))()
 
 @get_user
 async def web_app_data(update: Update, context: CallbackContext, user: TelegramUser) -> None:
@@ -138,7 +138,6 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
         longitude = location.longitude
         latitude = location.latitude
         location_path = f"https://www.google.com/maps?q={latitude},{longitude}&ll={latitude},{longitude}&z=16"
-        print(location_path)
         order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
         order.location_path = location_path
         await order.asave()

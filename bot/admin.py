@@ -7,24 +7,29 @@ from solo.admin import SingletonModelAdmin
 from django.db.models import Sum, F, FloatField
 from django.db.models import Q
 from django.utils.html import format_html
+from import_export.admin import ImportExportModelAdmin
+from django.http import HttpResponseRedirect
 
 
 @admin.register(ClientCategory)
 class ClientCategoryAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
     search_fields = ("name", )
+    list_display_links = list_display
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("title", "cover")
     search_fields = ("title",)
+    list_display_links = list_display
 
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ("id", "username", "first_name", "last_name", "role", )
     fields = ("username", "first_name", "last_name", "role")
+    list_display_links = list_display
 
     def get_fields(self, request: HttpRequest, obj=None):
         if not obj:
@@ -41,16 +46,29 @@ class CustomUserAdmin(admin.ModelAdmin):
 admin.site.register(Contact, SingletonModelAdmin)
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("title", "is_active", "price_uzs", "price_usd")
+    list_display = ("id", "title", "is_active", "get_price_uzs", "get_price_usd", "amount")
     list_editable = ('is_active', )
+    list_display_links = ("id", "title", "get_price_uzs", "get_price_usd")
 
+    def get_price_uzs(self, obj):
+        return f"{obj.price_uzs:,}"
+    get_price_uzs.short_description = "Цена (сум)"
+
+    def get_price_usd(self, obj):
+        return f"{obj.price_usd:,}"
+    get_price_usd.short_description = "Цена (USD)"
+
+
+from bot.resources import UsersTableResourse
 
 @admin.register(TelegramUser)
-class TelegramUserAdmin(admin.ModelAdmin):
-    list_display = ("id", "first_name", "last_name", "username", "is_agent", "phone", "category")
-    list_display_links = ("id", "first_name", "last_name")
+class TelegramUserAdmin(ImportExportModelAdmin):
+    list_display = ("id", "first_name", "last_name", "username", "tin", "is_agent", "phone", "category")
+    list_display_links =  ("id", "first_name", "last_name", "username", "phone", "category")
     list_editable = ("is_agent", )
-    search_fields = ("first_name", "last_name", "username", "phone")
+    resource_classes = (UsersTableResourse, )
+    skip_export_form = True
+    search_fields = ("tin", "first_name", "last_name", "username", "phone")
     readonly_fields = ("telegram_id", "phone")
 
 
@@ -72,12 +90,24 @@ class OrderItemTabularInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "status",  "get_total_cost", "location_path")
     list_per_page = 20
-    list_display_links = ("id", "user",)
     inlines = (OrderItemTabularInline, )
     fields = ("user", "status", "payment_status", "payment_type")
     list_filter = ("user", "agent", "user__territory",)
     search_fields = ("id",)
     date_hierarchy = "created_at"
+
+    actions = ['generate_multiple_pdfs']
+
+    def generate_multiple_pdfs(self, request, queryset):
+        selected_ids = queryset.values_list('id', flat=True)
+
+        if len(selected_ids) == 1:
+            return HttpResponseRedirect(f'/pdf/{selected_ids[0]}/')
+        else:
+            ids = ','.join(str(pk) for pk in selected_ids)
+            return HttpResponseRedirect(f'/generate-multiple-pdfs/?ids={ids}')
+
+    generate_multiple_pdfs.short_description = "Generate PDFs for selected objects"
 
     def get_readonly_fields(self, request, obj=None):
         if request.user.role == "accountant":
@@ -161,7 +191,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
     def get_total_cost(self, obj):
-        return obj.total_price if obj.total_price else 0
+        return f"{(obj.total_price if obj.total_price else 0 + 500000):,}"
 
     get_total_cost.short_description = "Umumiy summa"
 
@@ -172,8 +202,13 @@ class OrderAdmin(admin.ModelAdmin):
             )
     get_location.short_description = "Место доставки"
 
+    list_display_links = ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
+
+
 
 @admin.register(Area)
 class AreaAdmin(admin.ModelAdmin):
     list_display = ("id", "name",)
     search_fields = ("name",)
+    list_display_links = list_display
+

@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'bot',
-    'solo'
+    'solo',
+    'import_export'
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+from import_export.formats.base_formats import XLSX
+EXPORT_FORMATS = [XLSX]
 
 ROOT_URLCONF = 'core.urls'
 
