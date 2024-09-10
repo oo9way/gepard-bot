@@ -59,7 +59,7 @@ class ProductAdmin(admin.ModelAdmin):
     get_price_usd.short_description = "Цена (USD)"
 
 
-from bot.resources import UsersTableResourse
+from bot.resources import UsersTableResourse, OrderResource
 
 @admin.register(TelegramUser)
 class TelegramUserAdmin(ImportExportModelAdmin):
@@ -87,14 +87,16 @@ class OrderItemTabularInline(admin.TabularInline):
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(ImportExportModelAdmin):
     list_display = ("id", "user", "status",  "get_total_cost", "location_path")
     list_per_page = 20
     inlines = (OrderItemTabularInline, )
     fields = ("user", "status", "payment_status", "payment_type")
-    list_filter = ("user", "agent", "user__territory",)
+    list_filter = ("user", "agent", "status", "payment_status", "user__territory",)
     search_fields = ("id",)
     date_hierarchy = "created_at"
+    resource_class = OrderResource
+    skip_export_form = True
 
     actions = ['generate_multiple_pdfs']
 
