@@ -62,8 +62,10 @@ class TelegramUser(models.Model):
     first_name = models.CharField("Имя", max_length=255, blank=True, null=True)
     last_name = models.CharField("Фамилия", max_length=255, blank=True, null=True)
     is_agent = models.BooleanField("Торговый представитель ?", default=False)
+    is_active = models.BooleanField("Он активен?", default=True)
     phone = models.CharField("Номер телефона", null=True, blank=True, max_length=255)
     is_updated = models.BooleanField(editable=False, default=False)
+    tin = models.CharField("ИНН", null=True, blank=True, max_length=255)
     category = models.ForeignKey(to=ClientCategory, verbose_name="Категория клиента", null=True, blank=True, on_delete=models.SET_NULL)
     territory = models.ManyToManyField("Area", verbose_name="Территория", null=True, blank=True)
 
@@ -134,6 +136,7 @@ class Order(models.Model):
         PAYME = "payme", "Payme"
         CLICK = "click", "Click"
         TERMINAL = "terminal", "Терминал"
+        TRANSFER = "transfer", "Перечисления"
         OTHER = "other", "Другой"
 
     class PaymentStatus(models.TextChoices):

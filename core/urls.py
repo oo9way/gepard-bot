@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from bot import views
+from bot import views, pdf_views
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -25,7 +25,9 @@ urlpatterns = [
     path('webapp/', views.WebAppTemplateView.as_view(), name="list"),
     # path('webapp/', views.WebAppHomePage.as_view(), name="list"),
     path("webapp/<int:pk>/", views.WebAppDetailPage.as_view(), name="detail"),
-    path("webapp/category/", views.WebAppCategoryPage.as_view(), name="by_category")
+    path("webapp/category/", views.WebAppCategoryPage.as_view(), name="by_category"),
+    path('pdf/<int:pk>/', pdf_views.generate_pdf_view, name='generate_pdf'),
+    path('generate-multiple-pdfs/', pdf_views.generate_multiple_pdfs_view, name='generate_multiple_pdfs'),
     # path("webapp/cart/", views.WebAppCartPage.as_view(), name="cart")
 ]
 
