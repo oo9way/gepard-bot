@@ -9,8 +9,20 @@ def generate_pdf_view(request, pk):
     # Get the object from the database
     obj = Order.objects.get(pk=pk)
 
+    data = {
+        "id": str(obj.id).zfill(10),
+        "order_time": obj.created_at,
+        "agent": f"{obj.agent.first_name} {obj.agent.last_name}",
+        "agent_number": str(obj.agent.phone if obj.agent.phone else ""),
+        "client": f"{obj.user.first_name} {obj.user.last_name}",
+        "payment_type": obj.get_payment_type_display(),
+        "address": obj.user.territory.first().name,
+        "phone": str(obj.user.phone if obj.user.phone else ""),
+        "items": obj.items.all(),
+    }
+
     # Render the HTML template with context data
-    html_string = render_to_string('contract.html', {'object': obj})
+    html_string = render_to_string('contract.html', {'data': data})
 
     # Convert HTML to PDF
     pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
