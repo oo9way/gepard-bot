@@ -109,7 +109,7 @@ class OrderAdmin(ImportExportModelAdmin):
             ids = ','.join(str(pk) for pk in selected_ids)
             return HttpResponseRedirect(f'/generate-multiple-pdfs/?ids={ids}')
 
-    generate_multiple_pdfs.short_description = "Generate PDFs for selected objects"
+    generate_multiple_pdfs.short_description = "Создать документ заказа"
 
     def get_readonly_fields(self, request, obj=None):
         if request.user.role == "accountant":

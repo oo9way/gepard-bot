@@ -44,7 +44,18 @@ def generate_multiple_pdfs_view(request):
     # Generate PDF for each object
     for pk in ids:
         obj = Order.objects.get(pk=pk)
-        html_string = render_to_string('contract.html', {'object': obj})
+        data = {
+            "id": str(obj.id).zfill(10),
+            "order_time": obj.created_at,
+            "agent": f"{obj.agent.first_name} {obj.agent.last_name}",
+            "agent_number": str(obj.agent.phone if obj.agent.phone else ""),
+            "client": f"{obj.user.first_name} {obj.user.last_name}",
+            "payment_type": obj.get_payment_type_display(),
+            "address": obj.user.territory.first().name,
+            "phone": str(obj.user.phone if obj.user.phone else ""),
+            "items": obj.items.all(),
+        }
+        html_string = render_to_string('contract.html', {'data': data})
         pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
         pdf_filename = os.path.join(temp_dir, f"object_{obj.id}.pdf")
         with open(pdf_filename, 'wb') as pdf_file_out:
