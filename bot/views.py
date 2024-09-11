@@ -30,6 +30,14 @@ class WebAppTemplateView(ListView):
                     }
                 )
 
+            else:
+                queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_a',
+                        'price_usd': f'price_usd_a'
+                    }
+                )
+
         else:
             queryset = queryset.extra(
                     select={
@@ -87,6 +95,13 @@ class WebAppCategoryPage(ListView):
                         'price_usd': f'price_usd_{category}'
                     }
                 )
+            else:
+                queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_a',
+                        'price_usd': f'price_usd_a'
+                    }
+                )
 
         else:
             queryset = queryset.extra(
@@ -120,6 +135,13 @@ class WebAppDetailPage(DetailView):
                     select={
                         'price_uzs': f'price_uzs_{category}',
                         'price_usd': f'price_usd_{category}'
+                    }
+                )
+            else:
+                queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_a',
+                        'price_usd': f'price_usd_a'
                     }
                 )
 
