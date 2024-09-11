@@ -239,6 +239,7 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
+    "order_with_respect_to": ["bot.order", "bot.product", "bot.category", "bot.telegramuser", "bot.area"],
 
     "icons": {
         "auth": "fas fa-users-cog",

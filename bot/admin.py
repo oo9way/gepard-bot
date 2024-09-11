@@ -11,11 +11,11 @@ from import_export.admin import ImportExportModelAdmin
 from django.http import HttpResponseRedirect
 
 
-@admin.register(ClientCategory)
-class ClientCategoryAdmin(admin.ModelAdmin):
-    list_display = ("id", "name")
-    search_fields = ("name", )
-    list_display_links = list_display
+# @admin.register(ClientCategory)
+# class ClientCategoryAdmin(admin.ModelAdmin):
+#     list_display = ("id", "name")
+#     search_fields = ("name", )
+#     list_display_links = list_display
 
 
 @admin.register(Category)
@@ -46,17 +46,14 @@ class CustomUserAdmin(admin.ModelAdmin):
 admin.site.register(Contact, SingletonModelAdmin)
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "is_active", "get_price_uzs", "get_price_usd", "amount")
-    list_editable = ('is_active', )
-    list_display_links = ("id", "title", "get_price_uzs", "get_price_usd")
+    list_display = ("id", "title", "is_active", "price_uzs_a", "price_usd_a", 
+                    "price_uzs_b", "price_usd_b","price_uzs_c", "price_usd_c", "amount")
+    list_editable = ('is_active', "price_uzs_a", "price_usd_a", 
+                    "price_uzs_b", "price_usd_b","price_uzs_c", "price_usd_c",)
+    list_display_links = ("id", "title",)
+    list_filter = ("category", "is_active")
+    search_fields = ("title", )
 
-    def get_price_uzs(self, obj):
-        return f"{obj.price_uzs:,}"
-    get_price_uzs.short_description = "Цена (сум)"
-
-    def get_price_usd(self, obj):
-        return f"{obj.price_usd:,}"
-    get_price_usd.short_description = "Цена (USD)"
 
 
 from bot.resources import UsersTableResourse, OrderResource
@@ -66,6 +63,7 @@ class TelegramUserAdmin(ImportExportModelAdmin):
     list_display = ("id", "first_name", "last_name", "username", "tin", "is_agent", "phone", "category")
     list_display_links =  ("id", "first_name", "last_name", "username", "phone", "category")
     list_editable = ("is_agent", )
+    list_filter = ("category", "is_agent", "is_active")
     resource_classes = (UsersTableResourse, )
     skip_export_form = True
     search_fields = ("tin", "first_name", "last_name", "username", "phone")

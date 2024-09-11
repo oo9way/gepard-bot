@@ -57,6 +57,11 @@ class ClientCategory(models.Model):
 
 
 class TelegramUser(models.Model):
+    class UserCategory(models.TextChoices):
+        A = "a", "A"
+        B = "b", "B"
+        C = "c", "C"
+
     telegram_id = models.IntegerField(unique=True)
     username = models.CharField(max_length=255, blank=True, null=True)
     first_name = models.CharField("Имя", max_length=255, blank=True, null=True)
@@ -66,7 +71,7 @@ class TelegramUser(models.Model):
     phone = models.CharField("Номер телефона", null=True, blank=True, max_length=255)
     is_updated = models.BooleanField(editable=False, default=False)
     tin = models.CharField("ИНН", null=True, blank=True, max_length=255)
-    category = models.ForeignKey(to=ClientCategory, verbose_name="Категория клиента", null=True, blank=True, on_delete=models.SET_NULL)
+    category = models.CharField(verbose_name="Категория клиента", null=True, blank=True, max_length=255, choices=UserCategory.choices)
     territory = models.ManyToManyField("Area", verbose_name="Территория", null=True, blank=True)
 
     def get_full_name(self):
@@ -116,8 +121,18 @@ class Product(models.Model):
     )
     description = models.TextField("Комментарий")
     is_active = models.BooleanField("Активен", default=True)
-    price_uzs = models.FloatField("Цена (сум)", default=0)
-    price_usd = models.FloatField("Цена (долл. США)", default=0)
+    price_uzs = models.FloatField("Цена (сум)", default=0, editable=False)
+    price_usd = models.FloatField("Цена (долл. США)", default=0, editable=False)
+
+    price_uzs_a = models.FloatField("Цена (сум) A", default=0)
+    price_usd_a = models.FloatField("Цена (долл. США) A", default=0)
+    
+    price_uzs_b = models.FloatField("Цена (сум) B", default=0)
+    price_usd_b = models.FloatField("Цена (долл. США) B", default=0)
+    
+    price_uzs_c = models.FloatField("Цена (сум) C", default=0)
+    price_usd_c = models.FloatField("Цена (долл. США) C", default=0)
+    
     amount = models.IntegerField("Число", default=0)
     is_top = models.BooleanField("Популярный продукт", default=False)
 
