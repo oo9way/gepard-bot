@@ -23,20 +23,20 @@ class WebAppTemplateView(ListView):
             category = TelegramUser.objects.get(pk=user_id).category
 
             if category:
-                if category.action == "increase":
-                    queryset = queryset.extra(
-                        select={
-                            'price_uzs': f'price_uzs + {float(category.amount_uzs)}',
-                            'price_usd': f'price_usd + {float(category.amount_usd)}'
-                        }
-                    )
-                elif category.action == "decrease":
-                    queryset = queryset.extra(
-                        select={
-                            'price_uzs': f'price_uzs - {float(category.amount_uzs)}',
-                            'price_usd': f'price_usd - {float(category.amount_usd)}'
-                        }
-                    )
+                queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_{category}',
+                        'price_usd': f'price_usd_{category}'
+                    }
+                )
+
+        else:
+            queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_a',
+                        'price_usd': f'price_usd_a'
+                    }
+                )
 
         return queryset
     
@@ -81,20 +81,20 @@ class WebAppCategoryPage(ListView):
             category = TelegramUser.objects.get(pk=user_id).category
 
             if category:
-                if category.action == "increase":
-                    queryset = queryset.extra(
-                        select={
-                            'price_uzs': f'price_uzs + {float(category.amount_uzs)}',
-                            'price_usd': f'price_usd + {float(category.amount_usd)}'
-                        }
-                    )
-                elif category.action == "decrease":
-                    queryset = queryset.extra(
-                        select={
-                            'price_uzs': f'price_uzs - {float(category.amount_uzs)}',
-                            'price_usd': f'price_usd - {float(category.amount_usd)}'
-                        }
-                    )
+                queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_{category}',
+                        'price_usd': f'price_usd_{category}'
+                    }
+                )
+
+        else:
+            queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_a',
+                        'price_usd': f'price_usd_a'
+                    }
+                )
 
         return queryset
     
@@ -116,21 +116,20 @@ class WebAppDetailPage(DetailView):
             category = TelegramUser.objects.get(pk=user_id).category
 
             if category:
-                if category.action == "increase":
-                    queryset = queryset.extra(
-                        select={
-                            'price_uzs': f'price_uzs + {float(category.amount_uzs)}',
-                            'price_usd': f'price_usd + {float(category.amount_usd)}'
-                        }
-                    )
-                elif category.action == "decrease":
-                    queryset = queryset.extra(
-                        select={
-                            'price_uzs': f'price_uzs - {float(category.amount_uzs)}',
-                            'price_usd': f'price_usd - {float(category.amount_usd)}'
-                        }
-                    )
+                queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_{category}',
+                        'price_usd': f'price_usd_{category}'
+                    }
+                )
 
+        else:
+            queryset = queryset.extra(
+                    select={
+                        'price_uzs': f'price_uzs_a',
+                        'price_usd': f'price_usd_a'
+                    }
+                )
         return queryset
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
