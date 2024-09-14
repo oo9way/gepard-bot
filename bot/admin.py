@@ -49,7 +49,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "is_active", "price_uzs_a", "price_usd_a", 
                     "price_uzs_b", "price_usd_b","price_uzs_c", "price_usd_c", "amount")
     list_editable = ('is_active', "price_uzs_a", "price_usd_a", 
-                    "price_uzs_b", "price_usd_b","price_uzs_c", "price_usd_c",)
+                    "price_uzs_b", "price_usd_b","price_uzs_c", "price_usd_c", "amount")
     list_display_links = ("id", "title",)
     list_filter = ("category", "is_active")
     search_fields = ("title", )
@@ -110,6 +110,9 @@ class OrderAdmin(ImportExportModelAdmin):
     generate_multiple_pdfs.short_description = "Создать документ заказа"
 
     def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status == "cancelled":
+            return [field.name for field in self.model._meta.fields]
+        
         if request.user.role == "accountant":
             if obj.status != "pending":
                 return ("status", "user")
@@ -146,11 +149,15 @@ class OrderAdmin(ImportExportModelAdmin):
         return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
 
     def get_accountant_approve_time(self, obj):
+        if obj and obj.status == "cancelled" and obj.accountant_approve_time:
+            return format_html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg> Отменено')
         return format_html(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.accountant_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.accountant_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
 
     get_accountant_approve_time.short_description = "Бухгалтер"
 
     def get_director_approve_time(self, obj):
+        if obj and obj.status == "cancelled" and obj.director_approve_time:
+            return format_html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg> Отменено')
         return format_html(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.director_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.director_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
 
 
@@ -198,9 +205,9 @@ class OrderAdmin(ImportExportModelAdmin):
     def get_location(self, obj):
         if obj.location_path:
             return format_html(
-                f"<a href='{obj.location_path}'>Посмотреть место доставки</a>"
+                f"<a href='{obj.location_path}'>Посмотреть место нахождения</a>"
             )
-    get_location.short_description = "Место доставки"
+    get_location.short_description = "Место нахождения"
 
     list_display_links = ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
 
