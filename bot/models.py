@@ -163,14 +163,17 @@ class Order(models.Model):
         APPROVED_BY_ACCOUNTANT = "approved_by_account", "Аттестовано бухгалтером"
         APPROVED_BY_DIRECTOR = "approved_by_director", "Утверждено директором"
         APPROVED_BY_STOREKEEPER = "approved_by_storekeeper", "Подтверждено кладовщиком"
+        CANCELLED = "cancelled", "Отменено"
 
     class DirectorStatus(models.TextChoices):
         APPROVED_BY_ACCOUNTANT = "approved_by_account", "Аттестовано бухгалтером"
         APPROVED_BY_DIRECTOR = "approved_by_director", "Утверждено директором"
+        CANCELLED = "cancelled", "Отменено"
 
     class AccountantStatus(models.TextChoices):
         PENDING = "pending", "Yangi"
         APPROVED_BY_ACCOUNTANT = "approved_by_account", "Аттестовано бухгалтером"
+        CANCELLED = "cancelled", "Отменено"
 
     class StoreKeeperStatus(models.TextChoices):
         APPROVED_BY_DIRECTOR = "approved_by_director", "Утверждено директором"
