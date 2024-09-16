@@ -114,11 +114,11 @@ def generate_multiple_pdfs_view(request):
             "id": str(obj.id).zfill(10),
             "order_time": obj.created_at,
             "agent": f"{obj.agent.get_full_name() if obj.agent else 'net agenta'}",
-            "agent_number": str(obj.agent.phone if obj.agent.phone else ""),
-            "client": f"{obj.user.first_name} {obj.user.last_name}",
+            "agent_number": str(obj.agent.phone if obj.agent and obj.agent.phone else ""),
+            "client": f"{obj.user.get_full_name() if obj.user else 'net klient'}",
             "payment_type": obj.get_payment_type_display(),
-            "address": obj.user.territory.first().name,
-            "phone": str(obj.user.phone if obj.user.phone else ""),
+            "address": obj.user.territory.first().name if obj.user and obj.user.territory else "net territori",
+            "phone": str(obj.user.phone if obj.user and obj.user.phone else ""),
             "items": obj.items.all(),
         }
         html_string = render_to_string('contract.html', {'data': data})
