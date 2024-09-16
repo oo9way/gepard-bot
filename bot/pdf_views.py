@@ -44,12 +44,14 @@ def generate_pdf2_view(request):
 
     for order in orders:
         users += order.user.get_full_name() + ", "
+        print(order.items.all().count(), "COUNT")
         for item in order.items.all():
+            print("Foolopp")
             total_sum += float(item.qty) * float(item.price_uzs)
             total_qty += float(item.qty)
 
             if item.product_id not in inserted_items:
-                print(vars(item))
+
                 items.append(
                     {
                         "id": item.product_id,
@@ -62,7 +64,9 @@ def generate_pdf2_view(request):
                     
                 )
                 inserted_items.append(item.product_id)
+                print(True)
             else:
+                print(False)
                 old_item = next((i for i in items if i["id"] == item.product_id), None)
                 new_item = {
                     "id": item.product_id,
