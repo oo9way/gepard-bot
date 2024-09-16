@@ -205,7 +205,7 @@ class OrderAdmin(ImportExportModelAdmin):
 
 
     def get_total_cost(self, obj):
-        return f"{(obj.total_price if obj.total_price else 0 + 500000):,}"
+        return f"{(obj.total_price):,}"
 
     get_total_cost.short_description = "Umumiy summa"
 
