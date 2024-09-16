@@ -151,7 +151,8 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
         message += "===================== \n\n"
         total_sum_uzs = 0
         total_sum_usd = 0
-        for item in order.items.all():
+        order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
+        async for item in order.items.all().aiterator():
             total_sum_uzs += float(item.qty) * float(item.price_uzs)
             total_sum_usd += float(item.qty) * float(item.price_usd)
 
