@@ -39,6 +39,7 @@ async def web_app_data(update: Update, context: CallbackContext, user: TelegramU
                     order=order,
                     product_name=product.title,
                     product_in_set=product.set_amount,
+                    product_id=product.pk,
                     qty=item['qty'],
                     set_amount=item['set'],
                     price_uzs=item['price_uzs'],

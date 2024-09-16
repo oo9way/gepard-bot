@@ -96,7 +96,7 @@ class OrderAdmin(ImportExportModelAdmin):
     resource_class = OrderResource
     skip_export_form = True
 
-    actions = ['generate_multiple_pdfs', 'generate_pdf2']
+    actions = ['generate_multiple_pdfs', 'generate_pdf2', 'configure_ids']
 
     def generate_multiple_pdfs(self, request, queryset):
         selected_ids = queryset.values_list('id', flat=True)
@@ -115,6 +115,12 @@ class OrderAdmin(ImportExportModelAdmin):
         return HttpResponseRedirect(f'/pdf/?orders={ids}')
 
     generate_pdf2.short_description = "Накладная общая сумма"
+
+    def configure_ids(self, request, queryset):
+        for order in queryset:
+            for product in order.items.all():
+                p = Product.objects.filter(title__icontains=product.product_name).last()
+                product.product_id = p.pk if p else 0 
 
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.status == "cancelled":
