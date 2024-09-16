@@ -113,7 +113,7 @@ def generate_multiple_pdfs_view(request):
         data = {
             "id": str(obj.id).zfill(10),
             "order_time": obj.created_at,
-            "agent": f"{obj.agent.first_name} {obj.agent.last_name}",
+            "agent": f"{obj.agent.get_full_name() if obj.agent else 'net agenta'}",
             "agent_number": str(obj.agent.phone if obj.agent.phone else ""),
             "client": f"{obj.user.first_name} {obj.user.last_name}",
             "payment_type": obj.get_payment_type_display(),
