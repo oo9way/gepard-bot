@@ -71,6 +71,7 @@ class TelegramUser(models.Model):
     phone = models.CharField("Номер телефона", null=True, blank=True, max_length=255)
     is_updated = models.BooleanField(editable=False, default=False)
     tin = models.CharField("ИНН", null=True, blank=True, max_length=255)
+    limit = models.FloatField("Сумма лимит (UZS)", default=0)
     category = models.CharField(verbose_name="Категория клиента", null=True, blank=True, max_length=255, choices=UserCategory.choices)
     territory = models.ManyToManyField("Area", verbose_name="Территория", null=True, blank=True)
 
@@ -133,7 +134,8 @@ class Product(models.Model):
     price_uzs_c = models.FloatField("Цена (сум) C", default=0)
     price_usd_c = models.FloatField("Цена (долл. США) C", default=0)
     
-    amount = models.IntegerField("Число", default=0)
+    amount = models.FloatField("Количество", default=0)
+    set_amount = models.FloatField("Количество в наборе", default=0)
     is_top = models.BooleanField("Популярный продукт", default=False)
 
     class Meta:
@@ -206,7 +208,9 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(verbose_name="Заказ", related_name="items", to=Order, on_delete=models.CASCADE)
     product_name = models.CharField("Название продукта", max_length=255)
-    qty = models.CharField("Число", max_length=255)
+    product_in_set = models.FloatField("Количество в Набор", default=0)
+    qty = models.CharField("Количество", max_length=255)
+    set_amount = models.CharField("Набор", max_length=255, default="0")
     price_uzs = models.CharField("Цена sum", max_length=255)
     price_usd = models.CharField("Цена USD", max_length=255)
 

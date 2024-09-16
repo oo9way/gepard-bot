@@ -123,12 +123,14 @@
             }
 
             document.querySelector(".amountOfProduct").value = getItemCount("{{product.id}}")
+            document.querySelector(".amountOfSet").value = (Number(getItemCount("{{product.id}}")) / Number(document.querySelector(".productSetAmount").value)).toFixed(2)
         })
         </script>
         
         <div class="products mt-2 p-3">
+            <hr>
             <div class="row">
-                <div class="col-6"><b>Число:</b></div>
+                <div class="col-6"><b>Количество:</b></div>
                 <div class="col-6">
                     <div class="counter-group">
                         <input type="hidden" name="productSingleId" class="productSingleId" value="{{product.id}}">
@@ -136,6 +138,7 @@
                         <input type="hidden" name="productPriceUzs" class="productPriceUzs" value="{{product.price_uzs}}">
                         <input type="hidden" name="productCover" class="productCover" value="{{product.cover.url}}">
                         <input type="hidden" name="productPriceUsd" class="productPriceUsd" value="{{product.price_usd}}">
+                        <input type="hidden" name="productSetAmount" class="productSetAmount" value="{{product.set_amount}}">
                         <button onclick="decreaseQuantity('{{product.id}}')">-</button>
                         <input type="text" class="amountOfProduct" value="0">
                         <button 
@@ -144,7 +147,26 @@
                             data-item-price-uzs="{{product.price_uzs}}" 
                             data-item-price-usd="{{product.price_usd}}"
                             data-item-cover="{{product.cover.url}}"
+                            data-item-set="{{product.set_amount}}"
                             class="add-cart">+</button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-6"><b>Набор:</b></div>
+                <div class="col-6">
+                    <div class="counter-group">
+                        <button onclick="decreaseSetQuantity('{{product.id}}','{{product.set_amount}}')">-</button>
+                        <input type="text" class="amountOfSet" value="0">
+                        <button 
+                            data-item-id="{{product.id}}" 
+                            data-item-name="{{product.title}}" 
+                            data-item-price-uzs="{{product.price_uzs}}" 
+                            data-item-price-usd="{{product.price_usd}}"
+                            data-item-cover="{{product.cover.url}}"
+                            data-item-set="{{product.set_amount}}"
+                            class="add-cart-set">+</button>
                     </div>
                 </div>
             </div>

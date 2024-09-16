@@ -26,6 +26,7 @@ urlpatterns = [
     # path('webapp/', views.WebAppHomePage.as_view(), name="list"),
     path("webapp/<int:pk>/", views.WebAppDetailPage.as_view(), name="detail"),
     path("webapp/category/", views.WebAppCategoryPage.as_view(), name="by_category"),
+    path('pdf/', pdf_views.generate_pdf2_view, name='generate_pdf2'),
     path('pdf/<int:pk>/', pdf_views.generate_pdf_view, name='generate_pdf'),
     path('generate-multiple-pdfs/', pdf_views.generate_multiple_pdfs_view, name='generate_multiple_pdfs'),
     # path("webapp/cart/", views.WebAppCartPage.as_view(), name="cart")

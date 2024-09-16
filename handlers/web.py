@@ -38,7 +38,9 @@ async def web_app_data(update: Update, context: CallbackContext, user: TelegramU
                 OrderItem(
                     order=order,
                     product_name=product.title,
+                    product_in_set=product.set_amount,
                     qty=item['qty'],
+                    set_amount=item['set'],
                     price_uzs=item['price_uzs'],
                     price_usd=item['price_usd']
                 )
@@ -141,7 +143,25 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
         order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
         order.location_path = location_path
         await order.asave()
-        message = "Заказ выполнен успешно"
+        message = "<b>Заказ выполнен успешно</b>\n"
+        message += f"<b>Клиент:</b> {order.user.get_full_name()}\n"
+        message += f"<b>Статус:</b> {order.get_status_display()}\n"
+        message += "===================== \n\n"
+        total_sum_uzs = 0
+        total_sum_usd = 0
+        for item in order.items.all():
+            total_sum_uzs += float(item.qty) * float(item.price_uzs)
+            total_sum_usd += float(item.qty) * float(item.price_usd)
+
+            message += f"{item.product_name} - {item.qty} шт. {item.set_amount} набор\n"
+        message += "\n=====================\n"
+        message += f"<b>Общая сумма (UZS):</b> {total_sum_uzs:,}\n"
+        message += f"<b>Общая сумма (USD):</b> {total_sum_usd:,}"
+
+        if total_sum_uzs > user.limit:
+            order.adelete()
+            message = "Заказ отменен, так как баланс клиента превысил лимит"
+        
         await update.message.reply_text(message, reply_markup=replies.get_agent_main())
         return -1
     

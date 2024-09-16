@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'bot',
     'solo',
-    'import_export'
+    'import_export',
 ]
 
 MIDDLEWARE = [
