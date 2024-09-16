@@ -165,7 +165,7 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
             order.adelete()
             message = "Заказ отменен, так как баланс клиента превысил лимит"
         
-        await update.message.reply_text(message, reply_markup=replies.get_agent_main())
+        await update.message.reply_text(message, reply_markup=replies.get_agent_main(), parse_mode="html")
         return -1
     
     message = "Пожалуйста, отправьте местоположение с помощью кнопки"
