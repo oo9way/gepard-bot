@@ -48,10 +48,10 @@ def generate_pdf2_view(request):
             total_sum += float(item.qty) * float(item.price_uzs)
             total_qty += float(item.qty)
 
-            if item.pk not in inserted_items:
+            if item.product_id not in inserted_items:
                 items.append(
                     {
-                        "id": item.pk,
+                        "id": item.product_id,
                         "title": item.product_name,
                         "product_in_set": float(item.product_in_set),
                         "set_amount": float(item.set_amount),
@@ -60,9 +60,9 @@ def generate_pdf2_view(request):
                     },
                     
                 )
-                inserted_items.append(item.pk)
+                inserted_items.append(item.product_id)
             else:
-                old_item = next((i for i in items if i["id"] == item.pk), None)
+                old_item = next((i for i in items if i["id"] == item.product_id), None)
                 new_item = {
                     "title": old_item.get("product_name"),
                     "product_in_set": old_item.get("product_in_set"),
@@ -73,7 +73,7 @@ def generate_pdf2_view(request):
                 items.append(new_item)
                 items.remove(old_item)
 
-            selected_item = next((i for i in items if i["id"] == item.pk), None)
+            selected_item = next((i for i in items if i["id"] == item.product_id), None)
             nabor = selected_item['qty'] - int(selected_item["set_amount"] * selected_item["product_in_set"])
             selected_item["case"] = nabor            
 

@@ -209,6 +209,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(verbose_name="Заказ", related_name="items", to=Order, on_delete=models.CASCADE)
     product_name = models.CharField("Название продукта", max_length=255)
     product_in_set = models.FloatField("Количество в Набор", default=0)
+    product_id = models.IntegerField(default=0)
     qty = models.CharField("Количество", max_length=255)
     set_amount = models.CharField("Набор", max_length=255, default="0")
     price_uzs = models.CharField("Цена sum", max_length=255)
