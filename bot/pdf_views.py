@@ -73,7 +73,7 @@ def generate_pdf2_view(request):
                 items.append(new_item)
                 items.remove(old_item)
 
-            selected_item = next((i for i in items if i["id"] == item.product_id), None)
+            selected_item = next((i for i in items if i["product_id"] == item.product_id), None)
             nabor = selected_item['qty'] - int(selected_item["set_amount"] * selected_item["product_in_set"])
             selected_item["case"] = nabor            
 
