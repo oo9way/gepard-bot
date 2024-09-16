@@ -142,10 +142,11 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
         latitude = location.latitude
         location_path = f"https://www.google.com/maps?q={latitude},{longitude}&ll={latitude},{longitude}&z=16"
         order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
+        user = await TelegramUser.objects.aget(id=order.user_id)
         order.location_path = location_path
         await order.asave()
         message = "<b>Заказ выполнен успешно</b>\n"
-        message += f"<b>Клиент:</b> {order.user.get_full_name()}\n"
+        message += f"<b>Клиент:</b> {user.first_name} {user.last_name}\n"
         message += f"<b>Статус:</b> {order.get_status_display()}\n"
         message += "===================== \n\n"
         total_sum_uzs = 0

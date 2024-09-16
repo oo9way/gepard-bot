@@ -96,7 +96,7 @@ class OrderAdmin(ImportExportModelAdmin):
     resource_class = OrderResource
     skip_export_form = True
 
-    actions = ['generate_multiple_pdfs', 'generate_pdf2', 'configure_ids']
+    actions = ['generate_multiple_pdfs', 'generate_pdf2']
 
     def generate_multiple_pdfs(self, request, queryset):
         selected_ids = queryset.values_list('id', flat=True)

@@ -49,7 +49,7 @@ def generate_pdf2_view(request):
             total_qty += float(item.qty)
 
             if item.product_id not in inserted_items:
-                print(vars(item))
+
                 items.append(
                     {
                         "id": item.product_id,
