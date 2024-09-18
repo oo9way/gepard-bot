@@ -58,9 +58,10 @@ class ClientCategory(models.Model):
 
 class TelegramUser(models.Model):
     class UserCategory(models.TextChoices):
-        A = "a", "A"
-        B = "b", "B"
-        C = "c", "C"
+        A = "a", "Стандарт"
+        B = "b", "-4%"
+        C = "c", "Хорека"
+        D = "d", "Оптовик"
 
     telegram_id = models.IntegerField(unique=True)
     username = models.CharField(max_length=255, blank=True, null=True)
@@ -125,15 +126,18 @@ class Product(models.Model):
     price_uzs = models.FloatField("Цена (сум)", default=0, editable=False)
     price_usd = models.FloatField("Цена (долл. США)", default=0, editable=False)
 
-    price_uzs_a = models.FloatField("Цена (сум) A", default=0)
-    price_usd_a = models.FloatField("Цена (долл. США) A", default=0)
+    price_uzs_a = models.FloatField("Стандарт Цена (сум)", default=0)
+    price_usd_a = models.FloatField("Стандарт Цена (долл. США)", default=0)
     
-    price_uzs_b = models.FloatField("Цена (сум) B", default=0)
-    price_usd_b = models.FloatField("Цена (долл. США) B", default=0)
+    price_uzs_b = models.FloatField("-4% Цена (сум)", default=0)
+    price_usd_b = models.FloatField("-4% Цена (долл. США)", default=0)
     
-    price_uzs_c = models.FloatField("Цена (сум) C", default=0)
-    price_usd_c = models.FloatField("Цена (долл. США) C", default=0)
+    price_uzs_c = models.FloatField("Хорека Цена (сум)", default=0)
+    price_usd_c = models.FloatField("Хорека Цена (долл. США)", default=0)
     
+    price_uzs_d = models.FloatField("Оптовик Цена (сум)", default=0)
+    price_uzs_d = models.FloatField("Оптовик Цена (сум)", default=0)
+
     amount = models.FloatField("Количество", default=0)
     set_amount = models.FloatField("Количество в наборе", default=0)
     is_top = models.BooleanField("Популярный продукт", default=False)
