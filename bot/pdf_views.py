@@ -4,6 +4,8 @@ from weasyprint import HTML, CSS
 from .models import Order
 import zipfile
 import os
+from PyPDF2 import PdfMerger
+import io
 
 def generate_pdf_view(request, pk):
     # Get the object from the database
@@ -102,13 +104,8 @@ def generate_pdf2_view(request):
 
 def generate_multiple_pdfs_view(request):
     ids = request.GET.get('ids').split(',')
-    zip_filename = "pdfs.zip"
-    temp_dir = "/tmp/generated_pdfs"
-    
-    if not os.path.exists(temp_dir):
-        os.makedirs(temp_dir)
+    merger = PdfMerger()
 
-    # Generate PDF for each object
     for pk in ids:
         obj = Order.objects.get(pk=pk)
         data = {
@@ -122,25 +119,26 @@ def generate_multiple_pdfs_view(request):
             "phone": str(obj.user.phone if obj.user and obj.user.phone else ""),
             "items": obj.items.all(),
         }
+
+        # Render the HTML template with context data
         html_string = render_to_string('contract.html', {'data': data})
-        pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
-        pdf_filename = os.path.join(temp_dir, f"object_{obj.id}.pdf")
-        with open(pdf_filename, 'wb') as pdf_file_out:
-            pdf_file_out.write(pdf_file)
 
-    # Add all PDFs to a zip file
-    with zipfile.ZipFile(zip_filename, 'w') as zipf:
-        for pdf_file in os.listdir(temp_dir):
-            zipf.write(os.path.join(temp_dir, pdf_file), pdf_file)
+        # Convert HTML to PDF as bytes
+        pdf_bytes = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
 
-    # Serve the zip file as an HTTP response
-    response = HttpResponse(open(zip_filename, 'rb'), content_type='application/zip')
-    response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'
+        # Wrap the bytes into a BytesIO object so that PdfMerger can read it
+        pdf_file = io.BytesIO(pdf_bytes)
 
-    # Cleanup temporary directory
-    for file in os.listdir(temp_dir):
-        os.remove(os.path.join(temp_dir, file))
-    os.rmdir(temp_dir)
+        # Append the in-memory PDF file to the merger
+        merger.append(pdf_file)
 
+    # Create a final response object to hold the merged PDF
+    output_pdf = io.BytesIO()
+    merger.write(output_pdf)
+    merger.close()
+
+    # Create an HTTP response with the merged PDF content
+    response = HttpResponse(output_pdf.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="merged_orders.pdf"'
+    
     return response
-
