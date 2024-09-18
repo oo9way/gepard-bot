@@ -46,10 +46,9 @@ class CustomUserAdmin(admin.ModelAdmin):
 admin.site.register(Contact, SingletonModelAdmin)
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "is_active", "price_uzs_a", "price_usd_a", 
-                    "price_uzs_b", "price_usd_b","price_uzs_c", "price_usd_c", "amount")
-    list_editable = ('is_active', "price_uzs_a", "price_usd_a", 
-                    "price_uzs_b", "price_usd_b","price_uzs_c", "price_usd_c", "amount")
+    list_display = ("id", "title", "is_active", "price_uzs_a", 
+                    "price_uzs_b","price_uzs_c", "price_uzs_d", "amount")
+    list_editable = ('is_active', "price_uzs_a", "price_uzs_b","price_uzs_c", "price_uzs_d", "amount")
     list_display_links = ("id", "title",)
     list_filter = ("category", "is_active")
     search_fields = ("title", )
