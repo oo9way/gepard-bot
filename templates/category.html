@@ -30,20 +30,12 @@
             mainButton.setText('Getting Location...').disable();
     
             if (navigator.geolocation) {
-                alert("Navigator is supported");
     
                 navigator.geolocation.getCurrentPosition(function(position) {
                     // Store latitude and longitude in variables
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
-                    
-                    // Ensure this alert works correctly
-                    alert(`Latitude: ${latitude}, Longitude: ${longitude}`);
-                    console.log("Latitude:", latitude, "Longitude:", longitude);
-    
-                    // Retrieve cart data from localStorage
                     const data = JSON.parse(localStorage.getItem('cart'));
-                    console.log("Cart data:", data);
     
                     // Create request object to send
                     const request = {
@@ -51,7 +43,6 @@
                         "longitude": longitude,
                         "latitude": latitude
                     };
-                    console.log("Request object:", request);
     
                     // Send request data to Telegram
                     Telegram.WebApp.sendData(JSON.stringify(request));
@@ -63,7 +54,6 @@
                 }, function(error) {
                     // Ensure this error alert works correctly
                     alert("Error retrieving geolocation: " + error.message);
-                    console.log("Geolocation error:", error);
     
                     // Re-enable the button and reset the text in case of error
                     mainButton.setText('BUYURTMA BERISH').enable();
