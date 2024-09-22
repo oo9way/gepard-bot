@@ -20,6 +20,7 @@ async def fetch_clients(territories):
 @get_user
 async def web_app_data(update: Update, context: CallbackContext, user: TelegramUser) -> None:
     data = json.loads(update.effective_message.web_app_data.data)
+    print(data)
 
     if not user.is_agent:
         await update.message.reply_html(
@@ -27,11 +28,22 @@ async def web_app_data(update: Update, context: CallbackContext, user: TelegramU
             reply_markup=replies.get_main()
         )
         return -1
-    
-    order = await Order.objects.acreate(user=user)
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+    print("LANG", latitude, "LONG", longitude)
+
+    if not longitude or not latitude:
+        await update.message.reply_text(
+            text="Заказ отменен, поскольку с устройства не было получено местоположение.",
+            reply_markup=replies.get_agent_main()
+        )
+        return -1
+
+    location_path = f"https://www.google.com/maps?q={latitude},{longitude}&ll={latitude},{longitude}&z=16"
+    order = await Order.objects.acreate(user=user, location_path=location_path)
     order_items = []
     
-    for item in data:
+    for item in data['data']:
         try:
             product = await Product.objects.aget(id=item['id'])
             order_items.append(
@@ -89,6 +101,7 @@ async def get_agent_client(update, context, user):
         message = "У вас нет клиентов"
         await update.message.reply_text(message, reply_markup=replies.get_agent_main())
         return -1
+        
 
     message = "Выберите клиента"
     await update.message.reply_text(message, reply_markup=inlines.get_user_inline_keyboard(clients))
@@ -129,9 +142,27 @@ async def get_payment(update: Update, context: CallbackContext, user:TelegramUse
     await order.asave()
     await update.callback_query.delete_message()
 
-    message = "Выберите адрес доставки"
-    await update.callback_query.message.reply_text(message, reply_markup=replies.get_location())
-    return states.CHOOSE_LOCATION
+    message = "<b>Заказ выполнен успешно</b>\n"
+    message += f"<b>Клиент:</b> {user.first_name} {user.last_name}\n"
+    message += f"<b>Статус:</b> {order.get_status_display()}\n"
+    message += "===================== \n\n"
+    total_sum_uzs = 0
+    total_sum_usd = 0
+    async for item in order.items.all().aiterator():
+        total_sum_uzs += float(item.qty) * float(item.price_uzs)
+        total_sum_usd += float(item.qty) * float(item.price_usd)
+
+        message += f"{item.product_name} - {item.qty} шт. {item.set_amount} набор\n"
+    message += "\n=====================\n"
+    message += f"<b>Общая сумма (UZS):</b> {total_sum_uzs:,}\n"
+    message += f"<b>Общая сумма (USD):</b> {total_sum_usd:,}"
+
+    if total_sum_uzs > user.limit:
+        order.adelete()
+        message = "Заказ отменен, так как баланс клиента превысил лимит"
+    
+    await update.callback_query.message.reply_text(message, reply_markup=replies.get_agent_main(), parse_mode="html")
+    return -1
 
 
 @get_user
@@ -140,10 +171,9 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
         location = update.message.location
         longitude = location.longitude
         latitude = location.latitude
-        location_path = f"https://www.google.com/maps?q={latitude},{longitude}&ll={latitude},{longitude}&z=16"
+        
         order = await Order.objects.aget(id=context.user_data['uncompleted_order_id'])
         user = await TelegramUser.objects.aget(id=order.user_id)
-        order.location_path = location_path
         await order.asave()
         message = "<b>Заказ выполнен успешно</b>\n"
         message += f"<b>Клиент:</b> {user.first_name} {user.last_name}\n"

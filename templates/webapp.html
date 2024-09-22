@@ -19,16 +19,59 @@
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 </head>
 <script type="text/javascript">
-    Telegram.WebApp.ready();
-    Telegram.WebApp.MainButton.setText('BUYURTMA BERISH').show().onClick(function () {
-        const data = localStorage.getItem('cart');
+    document.addEventListener("DOMContentLoaded", function() {
+        Telegram.WebApp.ready();
+    
+        const mainButton = Telegram.WebApp.MainButton;
         
-
-        Telegram.WebApp.sendData(data);
-        localStorage.clear();
-
-        Telegram.WebApp.close();
+        // Set initial button state
+        mainButton.setText('BUYURTMA BERISH').show();
+    
+        mainButton.onClick(function () {
+            // Disable the button to prevent multiple clicks while waiting for location
+            mainButton.setText('Getting Location...').disable();
+    
+            if (navigator.geolocation) {
+    
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    // Store latitude and longitude in variables
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    const data = JSON.parse(localStorage.getItem('cart'));
+    
+                    // Create request object to send
+                    const request = {
+                        "data": data, 
+                        "longitude": longitude,
+                        "latitude": latitude
+                    };
+    
+                    // Send request data to Telegram
+                    Telegram.WebApp.sendData(JSON.stringify(request));
+    
+                    // Clear localStorage and close the WebApp
+                    localStorage.clear();
+                    Telegram.WebApp.close(); // App should close on success
+    
+                }, function(error) {
+                    // Ensure this error alert works correctly
+                    alert("Error retrieving geolocation: " + error.message);
+    
+                    // Re-enable the button and reset the text in case of error
+                    mainButton.setText('BUYURTMA BERISH').enable();
+                }, {timeout: 3000});  // Optional: timeout for geolocation
+    
+            } else {
+                alert("Geolocation is not supported by this browser.");
+                
+                // Re-enable the button if geolocation is not supported
+                mainButton.setText('BUYURTMA BERISH').enable();
+            }
+        });
     });
+    
+    
+    
 </script>
 
 
