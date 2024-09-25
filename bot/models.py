@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.core.management import call_command
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
+from uuid import uuid4
+
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
@@ -64,7 +66,7 @@ class TelegramUser(models.Model):
         C = "c", "Хорека"
         D = "d", "Оптовик"
 
-    telegram_id = models.IntegerField(unique=True)
+    telegram_id = models.IntegerField(null=True, blank=True)
     username = models.CharField(max_length=255, blank=True, null=True, editable=False)
     first_name = models.CharField("Названия клиента", max_length=255, blank=True, null=True)
     last_name = models.CharField("Фамилия", max_length=255, blank=True, null=True, editable=False)
@@ -87,6 +89,12 @@ class TelegramUser(models.Model):
             })
         
         return super().clean()
+    
+    def save(self, *args, **kwargs):
+        if not self.telegram_id:
+            self.telegram_id = uuid4()
+
+        return super().save(*args, **kwargs)
 
     def get_full_name(self):
         first_name = self.first_name if self.first_name else ""
