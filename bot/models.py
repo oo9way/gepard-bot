@@ -66,7 +66,7 @@ class TelegramUser(models.Model):
         C = "c", "Хорека"
         D = "d", "Оптовик"
 
-    telegram_id = models.IntegerField(null=True, blank=True)
+    telegram_id = models.CharField(unique=True, max_length=255)
     username = models.CharField(max_length=255, blank=True, null=True, editable=False)
     first_name = models.CharField("Названия клиента", max_length=255, blank=True, null=True)
     last_name = models.CharField("Фамилия", max_length=255, blank=True, null=True, editable=False)
