@@ -80,11 +80,6 @@ class TelegramUser(models.Model):
     territory = models.ManyToManyField("Area", verbose_name="Территория", null=True, blank=True)
 
     def clean(self) -> None:
-        if not self.telegram_id:
-            raise ValidationError({
-                "telegram_id": 'Telegram ID — обязательное поле'
-            })
-        
         if not self.tin and not self.contract_id:
             raise ValidationError({
                 "tin": "ИНН и номер договора обязательны.",
