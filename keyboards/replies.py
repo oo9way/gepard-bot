@@ -11,7 +11,7 @@ def get_main(user_id=None):
             [
                 KeyboardButton(
                     text="🛍 Продукты",
-                    web_app=WebAppInfo(url=os.environ.get("WEBAPP") + f"?user_id={user_id}" if user_id else ""),
+                    web_app=WebAppInfo(url=os.environ.get("WEBAPP") + f"?user_id={user_id}" if user_id else os.environ.get("WEBAPP")),
                 )
             ],
             [

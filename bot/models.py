@@ -2,6 +2,7 @@ from django.db import models
 from solo.models import SingletonModel
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.management import call_command
+from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
 
 class CustomUser(AbstractUser):
@@ -64,17 +65,28 @@ class TelegramUser(models.Model):
         D = "d", "Оптовик"
 
     telegram_id = models.IntegerField(unique=True)
-    username = models.CharField(max_length=255, blank=True, null=True)
-    first_name = models.CharField("Имя", max_length=255, blank=True, null=True)
+    username = models.CharField(max_length=255, blank=True, null=True, editable=False)
+    first_name = models.CharField("Названия клиента", max_length=255, blank=True, null=True)
     last_name = models.CharField("Фамилия", max_length=255, blank=True, null=True)
     is_agent = models.BooleanField("Торговый представитель ?", default=False)
+    contract_id = models.CharField("Номер договор", null=True, blank=True, max_length=255)
     is_active = models.BooleanField("Он активен?", default=True)
     phone = models.CharField("Номер телефона", null=True, blank=True, max_length=255)
+    address = models.TextField("Адрес", null=True, blank=True)
     is_updated = models.BooleanField(editable=False, default=False)
     tin = models.CharField("ИНН", null=True, blank=True, max_length=255)
     limit = models.FloatField("Сумма лимит (UZS)", default=0)
     category = models.CharField(verbose_name="Категория клиента", null=True, blank=True, max_length=255, choices=UserCategory.choices)
     territory = models.ManyToManyField("Area", verbose_name="Территория", null=True, blank=True)
+
+    def clean(self) -> None:
+        if not self.tin and self.contract_id:
+            raise ValidationError({
+                "tin": "ИНН и номер договора обязательны.",
+                "contract_id": "ИНН и номер договора обязательны."
+            })
+        
+        return super().clean()
 
     def get_full_name(self):
         first_name = self.first_name if self.first_name else ""
