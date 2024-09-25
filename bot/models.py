@@ -67,7 +67,7 @@ class TelegramUser(models.Model):
     telegram_id = models.IntegerField(unique=True)
     username = models.CharField(max_length=255, blank=True, null=True, editable=False)
     first_name = models.CharField("Названия клиента", max_length=255, blank=True, null=True)
-    last_name = models.CharField("Фамилия", max_length=255, blank=True, null=True)
+    last_name = models.CharField("Фамилия", max_length=255, blank=True, null=True, editable=False)
     is_agent = models.BooleanField("Торговый представитель ?", default=False)
     contract_id = models.CharField("Номер договор", null=True, blank=True, max_length=255)
     is_active = models.BooleanField("Он активен?", default=True)
@@ -80,7 +80,7 @@ class TelegramUser(models.Model):
     territory = models.ManyToManyField("Area", verbose_name="Территория", null=True, blank=True)
 
     def clean(self) -> None:
-        if not self.tin and self.contract_id:
+        if not self.tin and not self.contract_id:
             raise ValidationError({
                 "tin": "ИНН и номер договора обязательны.",
                 "contract_id": "ИНН и номер договора обязательны."
