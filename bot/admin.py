@@ -68,8 +68,6 @@ class TelegramUserAdmin(ImportExportModelAdmin):
     search_fields = ("tin", "first_name", "last_name", "username", "phone")
     readonly_fields = ("telegram_id", "phone")
 
-    def has_add_permission(self, request: HttpRequest) -> bool:
-        return False
 
 
 class OrderItemTabularInline(admin.TabularInline):
