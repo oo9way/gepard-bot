@@ -30,31 +30,31 @@ async def category(update, context, user):
         [[
             InlineKeyboardButton(
                 text="Стандарт Цена (сум)", 
-                web_app=WebAppInfo(url=f"{base_url}?cate=a")
+                web_app=WebAppInfo(url=f"{base_url}?cate=a&preview=1")
             )
         ],
         [
             InlineKeyboardButton(
                 text="-4% Цена (сум)", 
-                web_app=WebAppInfo(url=f"{base_url}?cate=b")
+                web_app=WebAppInfo(url=f"{base_url}?cate=b&preview=1")
             )
         ],
         [
             InlineKeyboardButton(
                 text="Хорека Цена (сум)", 
-                web_app=WebAppInfo(url=f"{base_url}?cate=c")
+                web_app=WebAppInfo(url=f"{base_url}?cate=c&preview=1")
             )
         ],
         [
             InlineKeyboardButton(
                 text="Оптовик Цена (сум)", 
-                web_app=WebAppInfo(url=f"{base_url}?cate=d")
+                web_app=WebAppInfo(url=f"{base_url}?cate=d&preview=1")
             )
         ],
         [
             InlineKeyboardButton(
                 text="-2% Цена (сум)", 
-                web_app=WebAppInfo(url=f"{base_url}?cate=e")
+                web_app=WebAppInfo(url=f"{base_url}?cate=e&preview=1")
             )
         ]]
     )
