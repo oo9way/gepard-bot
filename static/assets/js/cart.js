@@ -13,13 +13,11 @@ function updateCartCount() {
 
 function updateSingleTotal(productId){
     const totalSinglePriceUzs = document.getElementById("totalSinglePriceUzs");
-    const totalSinglePriceUsd = document.getElementById("totalSinglePriceUsd");
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     const itemIndex = cart.findIndex(item => item.id === productId);
     
     if (itemIndex !== -1) {
         totalSinglePriceUzs.innerHTML = Number(cart[itemIndex].qty * cart[itemIndex].price_uzs).toLocaleString()
-        totalSinglePriceUsd.innerHTML = Number(cart[itemIndex].qty * cart[itemIndex].price_usd).toLocaleString()
     }
 }
 
@@ -166,7 +164,6 @@ function updateCartDisplay() {
                     Код: #${item.id}
                 </div>
 
-                <div class="cart-product-usd">$ ${(item.price_usd).toLocaleString()}</div>
                 <div class="cart-product-uzs">${Number(item.price_uzs).toLocaleString()} сум</div>
             </div>
             <div class="col-2" style="align-items: center; justify-content: center; display: flex;">
@@ -180,10 +177,8 @@ function updateCartDisplay() {
                     <input type="hidden" name="productId" class="productId" value="${item.id}">
                     <input type="hidden" name="productName" class="productName" value="${item.name}">
                     <input type="hidden" name="productPriceUzs" class="productPriceUzs" value="${item.price_uzs}">
-                    <input type="hidden" name="productPriceUsd" class="productPriceUsd" value="${item.price_usd}">
                     <input type="hidden" name="productCover" class="productCover" value="${item.cover}">
                     <div class="total-prices">
-                        <div class="cart-total-usd">$ ${(item.price_usd * item.qty).toLocaleString()}</div>
                         <div class="cart-total-uzs">${(item.price_uzs * item.qty).toLocaleString()} сум</div>
                     </div>
                     <button onclick="decreaseQuantity('${item.id}')">-</button>
@@ -202,7 +197,6 @@ function updateCartDisplay() {
     // <li>
     //         <div>
     //             <span>${item.name} (${item.qty}x${item.price_uzs} сум) ${parseInt(item.qty) * parseInt(item.price_uzs)} сум</span><br>
-    //             <span>${item.name} (${item.qty}x$${item.price_usd}) $${parseInt(item.qty) * parseInt(item.price_usd)}</span>
     //         </div>
     //         <div class="cart-item-buttons">
     //             <button class="counter increase-counter" onclick="decreaseQuantity('${item.id}')">➖</button>
@@ -248,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Function to add an item to the cart
-    function addItem(productId, productName, amount, productPriceUzs, productPriceUsd, cover, fullUpdate = false, set = 1) {
+    function addItem(productId, productName, amount, productPriceUzs, cover, fullUpdate = false, set = 1) {
         var currentCount = getItemCount(productId);
         var newCount = 0;
         if (fullUpdate){
@@ -263,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const newSet = (newCount / set).toFixed(2);
 
         if (itemIndex === -1) {
-            cart.push({ id: productId, name: productName, qty: newCount, set:newSet, price_uzs: productPriceUzs, price_usd: productPriceUsd, cover:cover });
+            cart.push({ id: productId, name: productName, qty: newCount, set:newSet, price_uzs: productPriceUzs, cover:cover });
         } else {
             cart[itemIndex].qty = newCount;
             cart[itemIndex].set = newSet;
@@ -289,13 +283,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Function to add an item to the cart
-    function addItemSet(productId, productName, productPriceUzs, productPriceUsd, cover, setAmount, amount = 1, fullUpdate = false) {
+    function addItemSet(productId, productName, productPriceUzs, cover, setAmount, amount = 1, fullUpdate = false) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         const itemIndex = cart.findIndex(item => item.id === productId);
         let newProductAmount = setAmount * amount;
 
         if (itemIndex === -1) {
-            cart.push({ id: productId, name: productName, qty: newProductAmount, set:amount, price_uzs: productPriceUzs, price_usd: productPriceUsd, cover:cover });
+            cart.push({ id: productId, name: productName, qty: newProductAmount, set:amount, price_uzs: productPriceUzs, cover:cover });
         } else {
             if (fullUpdate === false){
                 let oldAmount = Number(cart[itemIndex].set);
@@ -355,11 +349,10 @@ document.addEventListener('DOMContentLoaded', function () {
             var productId = this.getAttribute('data-item-id');
             var productName = this.getAttribute('data-item-name');
             var productPriceUzs = this.getAttribute('data-item-price-uzs');
-            var productPriceUsd = this.getAttribute('data-item-price-usd');
             var productCover = this.getAttribute('data-item-cover');
             var productSet = this.getAttribute('data-item-set');
                 console.log("productSet", productSet)
-                addItem(productId, productName, 1, productPriceUzs, productPriceUsd, productCover, fullUpdate = false, productSet);
+                addItem(productId, productName, 1, productPriceUzs, productCover, fullUpdate = false, productSet);
                 document.querySelector('.amountOfProduct').value = getItemCount(productId);
                 document.querySelector('.amountOfSet').value = (getItemCount(productId) / Number(productSet)).toFixed(2);
         });
@@ -370,10 +363,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var productId = this.getAttribute('data-item-id');
             var productName = this.getAttribute('data-item-name');
             var productPriceUzs = this.getAttribute('data-item-price-uzs');
-            var productPriceUsd = this.getAttribute('data-item-price-usd');
             var productCover = this.getAttribute('data-item-cover');
             var productSet = this.getAttribute('data-item-set');
-                addItemSet(productId, productName, productPriceUzs, productPriceUsd, productCover, productSet);
+                addItemSet(productId, productName, productPriceUzs, productCover, productSet);
                 document.querySelector('.amountOfProduct').value = getItemCount(productId);
                 document.querySelector('.amountOfSet').value = (getItemCount(productId) / Number(productSet)).toFixed(2);
         });
@@ -384,7 +376,6 @@ document.addEventListener('DOMContentLoaded', function () {
             let productId = document.querySelector(".productSingleId");
             let productName = document.querySelector(".productName");
             let productPriceUzs = document.querySelector(".productPriceUzs");
-            let productPriceUsd = document.querySelector(".productPriceUsd");
             let productCover = document.querySelector(".productCover");
             let productSet = document.querySelector(".productSetAmount");
             let amount = String(document.querySelector(".amountOfProduct").value).replace(",", ".");
@@ -400,10 +391,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if(productPriceUzs){
                 productPriceUzs = productPriceUzs.value
             }
-    
-            if(productPriceUsd){
-                productPriceUsd = productPriceUsd.value
-            }
 
             if(productSet){
                 productSet = productSet.value
@@ -413,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 productCover = productCover.value;
             }
     
-            addItem(productId, productName, amount, productPriceUzs, productPriceUsd, productCover, fullUpdate = true, productSet); 
+            addItem(productId, productName, amount, productPriceUzs, productCover, fullUpdate = true, productSet); 
             document.querySelector('.amountOfSet').value = (getItemCount(productId) / Number(productSet)).toFixed(2);
         })
     }
@@ -423,7 +410,6 @@ document.addEventListener('DOMContentLoaded', function () {
             let productId = document.querySelector(".productSingleId");
             let productName = document.querySelector(".productName");
             let productPriceUzs = document.querySelector(".productPriceUzs");
-            let productPriceUsd = document.querySelector(".productPriceUsd");
             let productCover = document.querySelector(".productCover");
             let productSet = document.querySelector(".productSetAmount");
             
@@ -439,10 +425,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 productPriceUzs = productPriceUzs.value
             }
     
-            if(productPriceUsd){
-                productPriceUsd = productPriceUsd.value
-            }
-
             if(productSet){
                 productSet = Number(productSet.value)
             }
@@ -452,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var amount = String(document.querySelector(".amountOfSet").value).replace(",", ".");
             console.log("productSet", amount)
 
-            addItemSet(productId, productName, productPriceUzs, productPriceUsd, productCover, productSet, amount, fullUpdate = true);
+            addItemSet(productId, productName, productPriceUzs, productCover, productSet, amount, fullUpdate = true);
             document.querySelector('.amountOfProduct').value = getItemCount(productId);
         })
     }
