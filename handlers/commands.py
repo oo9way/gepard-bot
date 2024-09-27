@@ -27,7 +27,7 @@ async def category(update, context, user):
     
     base_url = os.environ.get("WEBAPP")
     keyboard = InlineKeyboardMarkup(
-        [
+        [[
             InlineKeyboardButton(
                 text="Стандарт Цена (сум)", 
                 web_app=WebAppInfo(url=f"{base_url}?cate=a")
@@ -56,7 +56,7 @@ async def category(update, context, user):
                 text="-2% Цена (сум)", 
                 web_app=WebAppInfo(url=f"{base_url}?cate=e")
             )
-        ],
+        ]]
     )
     return await update.message.reply_text("Выберите категорию",reply_markup=keyboard)
     
