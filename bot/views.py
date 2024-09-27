@@ -45,12 +45,22 @@ class WebAppTemplateView(ListView):
                         'price_usd': f'price_usd_a'
                     }
                 )
+            
+        cat = self.request.GET.get("cate", None)
+        if cat and (not user_id or user_id == "None"):
+            queryset = queryset.extra(
+                select={
+                    'price_uzs': f'price_uzs_{cat}',
+                    'price_usd': f'price_usd_{cat}'
+                }
+            )
 
         return queryset
     
     def get_context_data(self, **kwargs: Any):
         context =  super().get_context_data(**kwargs)
         context['user_id'] = self.request.GET.get("user_id", None)
+        context['cate'] = self.request.GET.get("cate", "a")
         context['categories'] = Category.objects.all()
         context['top'] = Product.objects.filter(is_top=True)
         return context
@@ -111,11 +121,21 @@ class WebAppCategoryPage(ListView):
                     }
                 )
 
+        cat = self.request.GET.get("cate", None)
+        if cat and (not user_id or user_id == "None"):
+            queryset = queryset.extra(
+                select={
+                    'price_uzs': f'price_uzs_{cat}',
+                    'price_usd': f'price_usd_{cat}'
+                }
+            )
+
         return queryset
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['user_id'] = self.request.GET.get("user_id", None)
+        context['cate'] = self.request.GET.get("cate", "a")
         return context
     
 
@@ -152,11 +172,21 @@ class WebAppDetailPage(DetailView):
                         'price_usd': f'price_usd_a'
                     }
                 )
+            
+        cat = self.request.GET.get("cate", None)
+        if cat and (not user_id or user_id == "None"):
+            queryset = queryset.extra(
+                select={
+                    'price_uzs': f'price_uzs_{cat}',
+                    'price_usd': f'price_usd_{cat}'
+                }
+            )
         return queryset
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['user_id'] = self.request.GET.get("user_id", None)
+        context['cate'] = self.request.GET.get("cate", "a")
         return context
 
 
