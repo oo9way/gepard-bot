@@ -76,7 +76,6 @@
 
 
 <body style="background-color: #f5f5fa">
-  <button id="loca">LOCA</button>
   <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -140,7 +139,6 @@
             </div>
 
             <ul class="product-prices-single">
-                <li>$ {{product.price_usd|intcomma}}</li>
 
                 <li>{{product.price_uzs|intcomma}} сум</li>
             </ul>
@@ -173,7 +171,6 @@
                         <input type="hidden" name="productName" class="productName" value="{{product.title}}">
                         <input type="hidden" name="productPriceUzs" class="productPriceUzs" value="{{product.price_uzs}}">
                         <input type="hidden" name="productCover" class="productCover" value="{{product.cover.url}}">
-                        <input type="hidden" name="productPriceUsd" class="productPriceUsd" value="{{product.price_usd}}">
                         <input type="hidden" name="productSetAmount" class="productSetAmount" value="{{product.set_amount}}">
                         <button onclick="decreaseQuantity('{{product.id}}')">-</button>
                         <input type="text" class="amountOfProduct" value="0">
@@ -181,7 +178,6 @@
                             data-item-id="{{product.id}}" 
                             data-item-name="{{product.title}}" 
                             data-item-price-uzs="{{product.price_uzs}}" 
-                            data-item-price-usd="{{product.price_usd}}"
                             data-item-cover="{{product.cover.url}}"
                             data-item-set="{{product.set_amount}}"
                             class="add-cart">+</button>
@@ -199,7 +195,6 @@
                             data-item-id="{{product.id}}" 
                             data-item-name="{{product.title}}" 
                             data-item-price-uzs="{{product.price_uzs}}" 
-                            data-item-price-usd="{{product.price_usd}}"
                             data-item-cover="{{product.cover.url}}"
                             data-item-set="{{product.set_amount}}"
                             class="add-cart-set">+</button>
@@ -212,7 +207,6 @@
                     <b>Общий</b>
                 </div>
                 <div class="col-6 align-right">
-                    <div>$ <span id="totalSinglePriceUsd">0</span></div>
                     <div><span id="totalSinglePriceUzs">0</span> сум</div>
                 </div>
             </div>
