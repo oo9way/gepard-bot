@@ -122,6 +122,7 @@
             </div>
             <form action="">
                 <input type="hidden" name="user_id" value="{{user_id}}">
+                <input type="hidden" name="cate" value="{{cate}}">
                 <input type="text" class="py-2 px-3 search-bar" name="q" placeholder="Поиск">
             </form>
         </div>
@@ -135,7 +136,7 @@
             <div class="row mt-2">
                 {% for category in categories %}
                     <div class="col-sm-3 col-3">
-                        <a href="{% url "by_category" %}?cat={{category.id}}&user_id={{user_id}}" class="link">
+                        <a href="{% url "by_category" %}?cat={{category.id}}&user_id={{user_id}}&cate={{cate}}" class="link">
                             <div class="cat-cover mb-1">
                                 <img src="{{category.cover.url}}" alt="">
                             </div>
@@ -154,7 +155,7 @@
             <div class="row mt-2">
                 {% for product in products %}
                     <div class="col-sm-6 p-2 col-6 m-0 p-0">
-                        <a href="{% url "detail" product.id %}?user_id={{user_id}}" class="link">
+                        <a href="{% url "detail" product.id %}?user_id={{user_id}}&cate={{cate}}" class="link">
                             <div class="cat-cover mb-1">
                                 <img src="{{product.cover.url}}" alt="">
                             </div>
