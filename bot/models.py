@@ -242,7 +242,7 @@ class OrderItem(models.Model):
     qty = models.CharField("Количество", max_length=255)
     set_amount = models.CharField("Набор", max_length=255, default="0")
     price_uzs = models.CharField("Цена sum", max_length=255)
-    price_usd = models.CharField("Цена USD", max_length=255)
+    price_usd = models.CharField("Цена USD", max_length=255, null=True, blank=True)
 
     class Meta:
         verbose_name = "Заказать товар"
