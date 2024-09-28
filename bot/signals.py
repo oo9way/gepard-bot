@@ -1,6 +1,6 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
-from bot.models import Order
+from bot.models import Order, Product
 from datetime import datetime
 
 
@@ -17,4 +17,11 @@ def update_approve_time(sender, instance, **kwargs):
         if old_instance.status == Order.OrderStatus.APPROVED_BY_DIRECTOR and old_instance.status != instance.status:
             instance.storekeeper_approve_time = datetime.now()
 
+            for item in instance.items.all():
+                try:
+                    product = Product.objects.get(id=item)
+                    product.amount = int(product.amount) - int(item.qty)
+                    product.save(update_fields=['amount'])
+                except:
+                    pass
             
