@@ -73,6 +73,10 @@ class TelegramUserAdmin(ImportExportModelAdmin):
 class OrderItemTabularInline(admin.TabularInline):
     model = OrderItem
     extra = 0
+    readonly_fields = ['get_real_qty']
+
+    def get_fields(self, request, obj=None):
+        return ['product_name', 'product_in_set', 'qty', 'set_amount', 'price_uzs', 'get_real_qty']
     
     def has_delete_permission(self, request, obj=None) -> bool:
         return False

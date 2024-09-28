@@ -125,7 +125,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = "Категория"
-        verbose_name_plural = "Категории"
+        verbose_name_plural = "Категория товаров"
 
     def __str__(self) -> str:
         return self.title
@@ -164,7 +164,7 @@ class Product(models.Model):
     
 
     amount = models.FloatField("Количество", default=0)
-    set_amount = models.FloatField("Количество в наборе", default=0)
+    set_amount = models.FloatField("Количество в блоке", default=0)
     is_top = models.BooleanField("Популярный продукт", default=False)
 
     class Meta:
@@ -237,16 +237,26 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(verbose_name="Заказ", related_name="items", to=Order, on_delete=models.CASCADE)
     product_name = models.CharField("Название продукта", max_length=255)
-    product_in_set = models.FloatField("Количество в Набор", default=0)
+    product_in_set = models.FloatField("Количество в Блок", default=0)
     product_id = models.IntegerField(default=0)
     qty = models.CharField("Количество", max_length=255)
-    set_amount = models.CharField("Набор", max_length=255, default="0")
+    set_amount = models.CharField("Блок", max_length=255, default="0")
     price_uzs = models.CharField("Цена sum", max_length=255)
-    price_usd = models.CharField("Цена USD", max_length=255, null=True, blank=True)
+    price_usd = models.CharField("Цена USD", max_length=255, null=True, blank=True, editable=False)
 
+    def get_real_qty(self):
+        try:
+            product = Product.objects.get(id=self.product_id)
+            set_amount = int(product.amount) // int(product.set_amount)
+            return f"{product.set_amount}x{set_amount}"
+        except:
+            return f"0x0"
+        
+    get_real_qty.short_description = "Oстатка"
+        
     class Meta:
-        verbose_name = "Заказать товар"
-        verbose_name_plural = "Заказать продукцию"
+        verbose_name = "Заказанные продукты"
+        verbose_name_plural = "Заказанные продукты"
 
 
 
