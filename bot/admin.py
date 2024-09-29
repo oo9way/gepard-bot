@@ -59,13 +59,13 @@ from bot.resources import UsersTableResourse, OrderResource
 
 @admin.register(TelegramUser)
 class TelegramUserAdmin(ImportExportModelAdmin):
-    list_display = ("id", "first_name", "last_name", "username", "tin", "is_agent", "phone", "category")
-    list_display_links =  ("id", "first_name", "last_name", "username", "phone", "category")
+    list_display = ("id", "first_name", "username", "tin", "is_agent", "phone", "category")
+    list_display_links =  ("id", "first_name", "username", "phone", "category")
     list_editable = ("is_agent", )
     list_filter = ("category", "is_agent", "is_active")
     resource_classes = (UsersTableResourse, )
     skip_export_form = True
-    search_fields = ("tin", "first_name", "last_name", "username", "phone")
+    search_fields = ("tin", "first_name", "username", "phone")
     readonly_fields = ("telegram_id", "phone")
 
 
