@@ -248,7 +248,7 @@ class OrderItem(models.Model):
         try:
             product = Product.objects.get(id=self.product_id)
             set_amount = int(product.amount) // int(product.set_amount)
-            return f"{product.set_amount}x{set_amount}"
+            return f"{product.amount} dona"
         except:
             return f"0x0"
         
