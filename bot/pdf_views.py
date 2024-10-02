@@ -28,12 +28,13 @@ def generate_pdf_view(request, pk):
     html_string = render_to_string('contract.html', {'data': data})
 
     # Convert HTML to PDF
-    # pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 portrait; }')])
+    pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 portrait; }')])
 
-    # # Create an HTTP response with PDF content
-    # response = HttpResponse(pdf_file, content_type='application/pdf')
-    # response['Content-Disposition'] = f'attachment; filename="object_{obj.id}.pdf"'
-    return render(request, "contract.html", {"data":data})
+    # Create an HTTP response with PDF content
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="object_{obj.id}.pdf"'
+    return response
+
 
 
 def generate_pdf2_view(request):
@@ -89,7 +90,6 @@ def generate_pdf2_view(request):
         "items": items,
     }
 
-    print(data)
 
     # Render the HTML template with context data
     html_string = render_to_string('contract2.html', {'data': data})
