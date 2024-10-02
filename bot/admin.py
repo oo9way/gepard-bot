@@ -9,13 +9,10 @@ from django.db.models import Q
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import Group
 
 
-# @admin.register(ClientCategory)
-# class ClientCategoryAdmin(admin.ModelAdmin):
-#     list_display = ("id", "name")
-#     search_fields = ("name", )
-#     list_display_links = list_display
+admin.site.unregister(Group)
 
 
 @admin.register(Category)
