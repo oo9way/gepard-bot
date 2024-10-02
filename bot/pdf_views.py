@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
+from django.shortcuts import render
 from .models import Order
 import zipfile
 import os
@@ -27,12 +28,12 @@ def generate_pdf_view(request, pk):
     html_string = render_to_string('contract.html', {'data': data})
 
     # Convert HTML to PDF
-    pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 portrait; }')])
+    # pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 portrait; }')])
 
-    # Create an HTTP response with PDF content
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="object_{obj.id}.pdf"'
-    return response
+    # # Create an HTTP response with PDF content
+    # response = HttpResponse(pdf_file, content_type='application/pdf')
+    # response['Content-Disposition'] = f'attachment; filename="object_{obj.id}.pdf"'
+    return render(request, "contract.html", {"data":data})
 
 
 def generate_pdf2_view(request):
@@ -94,7 +95,7 @@ def generate_pdf2_view(request):
     html_string = render_to_string('contract2.html', {'data': data})
 
     # Convert HTML to PDF
-    pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+    pdf_file = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 portrait; }')])
 
     # Create an HTTP response with PDF content
     response = HttpResponse(pdf_file, content_type='application/pdf')
@@ -124,7 +125,7 @@ def generate_multiple_pdfs_view(request):
         html_string = render_to_string('contract.html', {'data': data})
 
         # Convert HTML to PDF as bytes
-        pdf_bytes = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+        pdf_bytes = HTML(string=html_string).write_pdf(stylesheets=[CSS(string='@page { size: A4 portrait; }')])
 
         # Wrap the bytes into a BytesIO object so that PdfMerger can read it
         pdf_file = io.BytesIO(pdf_bytes)
