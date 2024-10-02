@@ -47,6 +47,7 @@
 
 .sub-title {
     font-size: 14px;
+    word-break: break-all;
 }
 
 .cat-cover {
