@@ -23,9 +23,16 @@
         const mainButton = Telegram.WebApp.MainButton;
         
         // Set initial button state
+        {% if not preview %}
         mainButton.setText('BUYURTMA BERISH').show();
+        {% else %}
+        mainButton.setText('BOTGA QAYTISH').show();
+        {% endif %}
     
         mainButton.onClick(function () {
+            {% if preview %}
+            Telegram.WebApp.close();
+            {% endif %}
             // Disable the button to prevent multiple clicks while waiting for location
             mainButton.setText('Getting Location...').disable();
     
