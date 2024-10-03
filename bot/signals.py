@@ -73,15 +73,11 @@ def make_order_message(order: Order, confirmer):
 def send_notification(chat_id, message):
     token = os.environ.get("TOKENS")
     if token:
-        try:
-            data = {
-                "chat_id": chat_id,
-                "text": message
-            }
-            endpoint = "https://api.telegram.org/bot{token}/sendMessage"
-            requests.post(endpoint, data)
-
-        except:
-            pass
-            # messages.warning("Заказ подтвержден, но не удается уведомить агента")
-    # messages.warning("Невозможно отправить сообщение, поскольку бот не настроен.")
+        data = {
+            "chat_id": chat_id,
+            "text": message
+        }
+        endpoint = "https://api.telegram.org/bot{token}/sendMessage"
+        requests.post(endpoint, data)
+    else:
+        raise Exception(f"Token not found {token}")
