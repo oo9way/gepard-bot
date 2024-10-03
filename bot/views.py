@@ -64,6 +64,7 @@ class WebAppTemplateView(ListView):
         context['preview'] = self.request.GET.get("preview") == "1"
         context['categories'] = Category.objects.all()
         context['top'] = Product.objects.filter(is_top=True)
+        context['prev_val'] = self.request.GET.get("preview")
         return context
     
 
@@ -83,6 +84,7 @@ class WebAppHomePage(ListView):
         context =  super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         context['top'] = Product.objects.filter(is_top=True)
+        context['prev_val'] = self.request.GET.get("preview")
         return context
 
 
@@ -138,6 +140,7 @@ class WebAppCategoryPage(ListView):
         context['user_id'] = self.request.GET.get("user_id", None)
         context['cate'] = self.request.GET.get("cate", "a")
         context['preview'] = self.request.GET.get("preview") == "1"
+        context['prev_val'] = self.request.GET.get("preview")
         return context
     
 
@@ -190,6 +193,7 @@ class WebAppDetailPage(DetailView):
         context['user_id'] = self.request.GET.get("user_id", None)
         context['cate'] = self.request.GET.get("cate", "a")
         context['preview'] = self.request.GET.get("preview") == "1"
+        context['prev_val'] = self.request.GET.get("preview")
         return context
 
 
