@@ -82,5 +82,6 @@ def send_notification(chat_id, message):
             requests.post(endpoint, data)
 
         except:
-            messages.warning("Заказ подтвержден, но не удается уведомить агента")
-    messages.warning("Невозможно отправить сообщение, поскольку бот не настроен.")
+            pass
+            # messages.warning("Заказ подтвержден, но не удается уведомить агента")
+    # messages.warning("Невозможно отправить сообщение, поскольку бот не настроен.")
