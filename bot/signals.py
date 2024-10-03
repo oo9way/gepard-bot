@@ -75,9 +75,10 @@ def send_notification(chat_id, message):
     if token:
         data = {
             "chat_id": chat_id,
-            "text": message
+            "text": message,
+            "parse_mode": "HTML"
         }
-        endpoint = "https://api.telegram.org/bot{token}/sendMessage"
-        requests.post(endpoint, data)
+        endpoint = f"https://api.telegram.org/bot{token}/sendMessage"
+        requests.post(endpoint, data=data)
     else:
         raise Exception(f"Token not found {token}")

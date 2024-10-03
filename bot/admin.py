@@ -90,7 +90,7 @@ class OrderAdmin(ImportExportModelAdmin):
     list_display = ("id", "user", "status",  "get_total_cost", "location_path")
     list_per_page = 20
     inlines = (OrderItemTabularInline, )
-    fields = ("user", "status", "payment_status", "payment_type")
+    fields = ("user", "agent", "status", "payment_status", "payment_type")
     list_filter = ("user", "agent", "status", "payment_status", "user__territory",)
     search_fields = ("id",)
     date_hierarchy = "created_at"
