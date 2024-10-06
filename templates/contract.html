@@ -1,4 +1,5 @@
 {% load humanize %}
+{% load mathfilters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,24 +97,24 @@
                 <td>{{forloop.counter}}</td>
                 <td>{{item.product_name}}</td>
                 <td>{{item.qty}}</td>
-                <td>0</td>
+                <td>{{item.product_in_set}}</td>
                 <td>{{item.price_uzs|intcomma}}</td>
-                <td>{{item.price_usd|intcomma}}</td>
+                <td>{{item.price_uzs|mul:item.qty|intcomma}}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr style="background-color: #efefef;">
                 <th colspan="5">Сумма без переоценки</th>
-                <th>0000</th>
+                <th>-</th>
             </tr>
             <tr style="background-color: #efefef;">
                 <th colspan="5">Сумма переоценки</th>
-                <th>0000</th>
+                <th>-</th>
             </tr>
             <tr style="background-color: #efefef;">
                 <th colspan="5">Сумма с учётом НДС</th>
-                <th>0000</th>
+                <th>-</th>
             </tr>
         </tfoot>
     </table>

@@ -175,7 +175,6 @@ class Product(models.Model):
         return self.title
 
 
-
 class Order(models.Model):
     class PaymentTypes(models.TextChoices):
         CASH = "cash", "Наличные"

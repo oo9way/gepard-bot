@@ -85,6 +85,164 @@ class OrderItemTabularInline(admin.TabularInline):
         return False    
 
 
+import openpyxl
+from openpyxl.styles import Font, Alignment, PatternFill, Side, Border
+from django.utils.timezone import localtime
+from django.http import HttpResponse
+
+def export_orders_to_excel(modeladmin, request, queryset):
+    # Create a new workbook and get the active worksheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Orders"
+
+    # Define the headers, based on your HTML structure
+    # headers = [
+    #     "Номер накладной", "Поставщик", "Дата отргрузки", "Дата консигнации", "Доставщик",
+    #     "Время заказа", "Торговый представитель", "Телефон представителя", "Контрагент",
+    #     "Тип оплаты", "Адрес", "Телефон"
+    # ]
+    # ws.append(headers)
+    ws.column_dimensions['A'].width = 20  # Номер накладной
+    ws.column_dimensions['B'].width = 25  # Поставщик
+    ws.column_dimensions['C'].width = 15  # Дата отгрузки
+    ws.column_dimensions['D'].width = 25  # Дата консигнации
+    ws.column_dimensions['E'].width = 20  # Доставщик
+    ws.column_dimensions['F'].width = 18  # Время заказа
+    ws.column_dimensions['G'].width = 25  # Торговый представитель
+    ws.column_dimensions['H'].width = 18  # Телефон представителя
+    ws.column_dimensions['I'].width = 20  # Контрагент
+    ws.column_dimensions['J'].width = 15  # Тип оплаты
+    ws.column_dimensions['K'].width = 25  # Адрес
+    ws.column_dimensions['L'].width = 18  # Телефон
+    
+
+    # Add each order's data to the workbook
+    row_count = 0
+    for order in queryset:
+        if row_count != 0:
+            ws.append(["", "", "", "", "", ""])
+            ws.append(["", "", "", "", "", ""])
+            ws.append(["", "", "", "", "", ""])
+
+        col1 = ["Номер накладной", f"#{str(order.id).zfill(6)}", "", "Tорговый представитель", f"{order.agent.first_name} {order.agent.last_name}"]
+        col2 = ["Поставщик", "", "", "Телефон представителя:", order.agent.phone if order.agent else "-"]
+        col3 = ["Дата отргрузки", "", "", "Контрагент:", f"{order.user.first_name} {order.user.last_name}"]
+        col4 = ["Дата консигнации", "", "", "Тип оплаты", order.get_payment_type_display()]
+        col5 = ["Доставщик", "", "", "Адрес", order.user.territory.first().name]
+        col6 = ["Время заказа", str(order.created_at.strftime("%d.%m.%Y %H:%M:%S")), "", "Телефон", str(order.user.phone if order.user.phone else "")]
+
+
+        # Append each row
+        ws.append(col1)
+        ws.append(col2)
+        ws.append(col3)
+        ws.append(col4)
+        ws.append(col5)
+        ws.append(col6)
+        ws.append(["", "", "", "", "", ""])
+        ws.append(["", "", "", "", "", ""])
+        
+        for row in range(row_count or 1, row_count+7):
+            ws[f"A{row}"].font = Font(bold=True)
+            ws[f"D{row}"].font = Font(bold=True)
+
+        item_headers = ["#", "Продукция", "Количество", "Количество в блоке", "цена", "Сумма"]
+        ws.append(item_headers)
+        row_count += 9
+
+        total_sum = 0
+        for index, item in enumerate(order.items.all(), start=1):
+            # Calculate the total in UZS
+            item_total = float(item.price_uzs) * float(item.qty)
+            total_sum += int(item_total)
+
+            # Format price and total with thousands separators
+            price_uzs_formatted = "{:,.0f}".format(float(item.price_uzs)).replace(",", " ")
+            item_total_formatted = "{:,.0f}".format(item_total).replace(",", " ")
+
+            # Prepare the data to append
+            item_data = [
+                index,
+                item.product_name,
+                item.qty,
+                item.product_in_set,
+                price_uzs_formatted,
+                item_total_formatted,
+            ]
+
+            # Append to the worksheet
+            ws.append(item_data)
+
+            for col_num in range(1, len(item_data) + 1):
+                cell = ws.cell(row=ws.max_row, column=col_num)
+                cell.alignment = Alignment(horizontal="right")
+
+        items_count = order.items.all().count()
+        row_count += items_count
+    
+        ws.merge_cells(f"A{row_count + 1}:E{row_count + 1}")
+        ws.merge_cells(f"A{row_count + 2}:E{row_count + 2}")
+        ws.merge_cells(f"A{row_count + 3}:E{row_count + 3}")
+
+        ws[f"A{row_count + 1}"] = "Сумма без переоценки"
+        ws[f"A{row_count + 2}"] = "Сумма переоценки"
+        ws[f"A{row_count + 3}"] = "Сумма с учётом НДС"
+        ws[f"A{row_count + 1}"].alignment = Alignment(horizontal="right", vertical="center")
+        ws[f"A{row_count + 2}"].alignment = Alignment(horizontal="right", vertical="center")
+        ws[f"A{row_count + 3}"].alignment = Alignment(horizontal="right", vertical="center")
+        ws[f"A{row_count + 1}"].font =  Font(bold=True)
+        ws[f"A{row_count + 2}"].font =  Font(bold=True)
+        ws[f"A{row_count + 3}"].font =  Font(bold=True)
+        
+        ws[f"F{row_count + 1}"] = total_sum
+        ws[f"F{row_count + 1}"].number_format = '# ##0'
+
+        ws.append([])  # Blank row for separation
+
+
+        fill = PatternFill(start_color="efefef", end_color="efefef", fill_type="solid")
+        thin = Side(border_style="thin", color="000000")
+        border = Border(left=thin, right=thin, top=thin, bottom=thin)
+        
+        for row in ws[f"A{row_count - items_count}:F{row_count+3}"]:
+            for cell in row:
+                cell.border = border
+
+        for row in ws[f"A{row_count - items_count}:F{row_count - items_count}"]:
+            for cell in row:
+                cell.fill = fill
+                cell.font =  Font(bold=True)
+
+        for row in ws[f"A{row_count + 1}:F{row_count+3}"]:
+            for cell in row:
+                cell.fill = fill
+
+        ws.merge_cells(f"A{row_count + 5}:C{row_count + 5}")
+        ws.merge_cells(f"A{row_count + 7}:C{row_count + 7}")
+        ws.merge_cells(f"A{row_count + 9}:C{row_count + 9}")
+
+        ws.merge_cells(f"D{row_count + 5}:F{row_count + 5}")
+        ws.merge_cells(f"D{row_count + 7}:F{row_count + 7}")
+        ws.merge_cells(f"D{row_count + 9}:F{row_count + 9}")
+        ws[f"A{row_count + 5}"] = "Провадец: ____________________"
+        ws[f"A{row_count + 7}"] = "Торговый представитель: ____________________"
+        ws[f"A{row_count + 9}"] = "Примечание:"
+        ws[f"D{row_count + 5}"] = "Получатель: ____________________"
+
+        row_count += 12
+
+    # Set up the HTTP response with the generated Excel file
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="orders.xlsx"'
+    wb.save(response)
+    return response
+
+export_orders_to_excel.short_description = "Накладная для заказа (Excel)"
+
+
 @admin.register(Order)
 class OrderAdmin(ImportExportModelAdmin):
     list_display = ("id", "user", "status",  "get_total_cost", "location_path")
@@ -97,7 +255,7 @@ class OrderAdmin(ImportExportModelAdmin):
     resource_class = OrderResource
     skip_export_form = True
 
-    actions = ['generate_multiple_pdfs', 'generate_pdf2']
+    actions = ['generate_multiple_pdfs', 'generate_pdf2', export_orders_to_excel]
 
     def generate_multiple_pdfs(self, request, queryset):
         selected_ids = queryset.values_list('id', flat=True)
@@ -108,14 +266,14 @@ class OrderAdmin(ImportExportModelAdmin):
             ids = ','.join(str(pk) for pk in selected_ids)
             return HttpResponseRedirect(f'/generate-multiple-pdfs/?ids={ids}')
 
-    generate_multiple_pdfs.short_description = "Накладная для заказа"
+    generate_multiple_pdfs.short_description = "Накладная для заказа (PDF)"
 
     def generate_pdf2(self, request, queryset):
         selected_ids = queryset.values_list('id', flat=True)
         ids = ','.join(str(pk) for pk in selected_ids)
         return HttpResponseRedirect(f'/pdf/?orders={ids}')
 
-    generate_pdf2.short_description = "Накладная общая сумма"
+    generate_pdf2.short_description = "Накладная общая сумма (PDF)"
 
     def configure_ids(self, request, queryset):
         for order in queryset:
