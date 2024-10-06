@@ -42,3 +42,4 @@ weasyprint==62.3
 webencodings==0.5.1
 zopfli==0.2.3
 PyPDF2
+django-mathfilters==1.0.0
