@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='orderitem',
             name='product_in_set',
-            field=models.FloatField(default=0, verbose_name='Количество в Набор'),
+            field=models.FloatField(default=0, verbose_name='Количество в блок'),
         ),
     ]
