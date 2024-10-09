@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='set_amount',
-            field=models.FloatField(default=1, verbose_name='Количество в наборе'),
+            field=models.FloatField(default=1, verbose_name='Количество в блоке'),
         ),
         migrations.AlterField(
             model_name='product',

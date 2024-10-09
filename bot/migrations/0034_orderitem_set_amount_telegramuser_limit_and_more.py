@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='orderitem',
             name='set_amount',
-            field=models.CharField(default='0', max_length=255, verbose_name='Набор'),
+            field=models.CharField(default='0', max_length=255, verbose_name='блок'),
         ),
         migrations.AddField(
             model_name='telegramuser',
@@ -33,6 +33,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='product',
             name='set_amount',
-            field=models.FloatField(default=0, verbose_name='Количество в наборе'),
+            field=models.FloatField(default=0, verbose_name='Количество в блоке'),
         ),
     ]

@@ -149,7 +149,7 @@ async def get_payment(update: Update, context: CallbackContext, user:TelegramUse
     async for item in order.items.all().aiterator():
         total_sum_uzs += float(item.qty) * float(item.price_uzs)
 
-        message += f"{item.product_name} - {item.qty} шт. {item.set_amount} набор\n"
+        message += f"{item.product_name} - {item.qty} шт. {item.set_amount} блок\n"
     message += "\n=====================\n"
     message += f"<b>Общая сумма (UZS):</b> {total_sum_uzs:,}\n"
     user = await TelegramUser.objects.aget(id=order.user_id)
@@ -180,7 +180,7 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
         async for item in order.items.all().aiterator():
             total_sum_uzs += float(item.qty) * float(item.price_uzs)
 
-            message += f"{item.product_name} - {item.qty} шт. {item.set_amount} набор\n"
+            message += f"{item.product_name} - {item.qty} шт. {item.set_amount} блок\n"
         message += "\n=====================\n"
         message += f"<b>Общая сумма (UZS):</b> {total_sum_uzs:,}\n"
 

@@ -26,9 +26,9 @@
         
         // Set initial button state
         {% if not preview %}
-        mainButton.setText('BUYURTMA BERISH').show();
+        mainButton.setText('Заказать').show();
         {% else %}
-        mainButton.setText('BOTGA QAYTISH').show();
+        mainButton.setText('Вернуться к боту').show();
         {% endif %}
     
         mainButton.onClick(function () {
@@ -65,14 +65,14 @@
                     alert("Error retrieving geolocation: " + error.message);
     
                     // Re-enable the button and reset the text in case of error
-                    mainButton.setText('BUYURTMA BERISH').enable();
+                    mainButton.setText('Заказать').enable();
                 }, {timeout: 3000});  // Optional: timeout for geolocation
     
             } else {
                 alert("Geolocation is not supported by this browser.");
                 
                 // Re-enable the button if geolocation is not supported
-                mainButton.setText('BUYURTMA BERISH').enable();
+                mainButton.setText('Заказать').enable();
             }
         });
     });
