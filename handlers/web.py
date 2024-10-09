@@ -152,8 +152,8 @@ async def get_payment(update: Update, context: CallbackContext, user:TelegramUse
         message += f"{item.product_name} - {item.qty} шт. {item.set_amount} набор\n"
     message += "\n=====================\n"
     message += f"<b>Общая сумма (UZS):</b> {total_sum_uzs:,}\n"
-
-    if total_sum_uzs > order.user.limit:
+    user = await TelegramUser.objects.aget(id=order.user_id)
+    if total_sum_uzs > user.limit:
         order.adelete()
         message = "Заказ отменен, так как баланс клиента превысил лимит"
     
@@ -184,7 +184,7 @@ async def get_location(update: Update, context: CallbackContext, user:TelegramUs
         message += "\n=====================\n"
         message += f"<b>Общая сумма (UZS):</b> {total_sum_uzs:,}\n"
 
-        if total_sum_uzs > order.user.limit:
+        if total_sum_uzs > user.limit:
             order.adelete()
             message = "Заказ отменен, так как баланс клиента превысил лимит"
         
