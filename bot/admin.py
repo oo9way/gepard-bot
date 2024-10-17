@@ -243,6 +243,113 @@ def export_orders_to_excel(modeladmin, request, queryset):
 export_orders_to_excel.short_description = "Накладная для заказа (Excel)"
 
 
+def export_invoice_total_amount(modeladmin, request, queryset):
+    # Create a new workbook and get the active worksheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Orders"
+
+    # Define the headers, based on your HTML structure
+    ws.column_dimensions['A'].width = 20  # Полъзователи
+    ws.column_dimensions['B'].width = 35
+    ws.column_dimensions['C'].width = 20
+    ws.column_dimensions['D'].width = 20
+    ws.column_dimensions['E'].width = 20
+    ws.column_dimensions['F'].width = 20
+    # Add each order's data to the workbook
+    col1 = ["Полъзователи", f"{', '.join([order.user.get_full_name() for order in queryset])}", "", ]
+    ws.append(col1)
+    ws.append(["", "", "", "", "", ""])
+
+    fill = PatternFill(start_color="efefef", end_color="efefef", fill_type="solid")
+    thin = Side(border_style="thin", color="000000")
+    border = Border(left=thin, right=thin, top=thin, bottom=thin)
+
+    # Append each row
+    item_headers = ["#", "Название", "Количество в блоке", "Блок", "Кол-во", "Сумма"]
+    ws.append(item_headers)
+    row_count = 3
+    total_count = 0
+    total_sum = 0
+    count = 0
+    for row in range(row_count or 1, row_count + 1):
+        ws[f"A{row}"].fill = fill
+        ws[f"B{row}"].fill = fill
+        ws[f"C{row}"].fill = fill
+        ws[f"D{row}"].fill = fill
+        ws[f"E{row}"].fill = fill
+        ws[f"F{row}"].fill = fill
+        ws[f"A{row}"].font = Font(bold=True)
+        ws[f"B{row}"].font = Font(bold=True)
+        ws[f"C{row}"].font = Font(bold=True)
+        ws[f"D{row}"].font = Font(bold=True)
+        ws[f"E{row}"].font = Font(bold=True)
+        ws[f"F{row}"].font = Font(bold=True)
+        ws[f"A{row}"].border = border
+        ws[f"B{row}"].border = border
+        ws[f"C{row}"].border = border
+        ws[f"D{row}"].border = border
+        ws[f"E{row}"].border = border
+        ws[f"F{row}"].border = border
+
+    for order in queryset:
+        for index, item in enumerate(order.items.all(), start=1):
+            # Calculate the total in UZS
+            count += 1
+            item_total = float(item.price_uzs) * float(item.qty)
+            total_sum += int(item_total)
+
+            # Format price and total with thousands separators
+            item_total_formatted = "{:,.0f}".format(item_total).replace(",", " ")
+            # Prepare the data to append
+            case = int(round(float(item.qty))) - int(float(item.set_amount) * float(item.product_in_set))
+            item_data = [
+                count,
+                item.product_name,
+                item.product_in_set,
+                f"{item.set_amount} Коробка {case} шт.",
+                item.qty,
+                item_total_formatted,
+            ]
+
+            ws.append(item_data)
+
+            for col_num in range(1, len(item_data) + 1):
+                cell = ws.cell(row=ws.max_row, column=col_num)
+                cell.alignment = Alignment(horizontal="right")
+                cell.border = border
+
+            total_count += int(float(item.qty))
+
+        items_count = order.items.all().count()
+        row_count += items_count
+
+    ws[f"A{count + 4}"] = ""
+    ws[f"B{count + 4}"] = ""
+    ws[f"C{count + 4}"] = ""
+    ws[f"D{count + 4}"] = "ИТОГО"
+    ws[f"E{count + 4}"] = total_count
+    ws[f"E{count + 4}"].alignment = Alignment(horizontal="left", vertical="center")
+    ws[f"E{count + 4}"].font = Font(bold=True)
+    ws[f"F{count + 4}"] = total_sum
+    ws[f"F{count + 4}"].number_format = '# ##0'
+
+    for row in ws[f"A{count + 4}:F{count + 4}"]:
+        for cell in row:
+            cell.fill = fill
+            cell.font = Font(bold=True)
+
+
+    # Set up the HTTP response with the generated Excel file
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="orders.xlsx"'
+    wb.save(response)
+    return response
+
+export_invoice_total_amount.short_description = "Накладная общая сумма (Excel)"
+
 @admin.register(Order)
 class OrderAdmin(ImportExportModelAdmin):
     list_display = ("id", "user", "status",  "get_total_cost", "location_path")
@@ -255,7 +362,7 @@ class OrderAdmin(ImportExportModelAdmin):
     resource_class = OrderResource
     skip_export_form = True
 
-    actions = ['generate_multiple_pdfs', 'generate_pdf2', export_orders_to_excel]
+    actions = ['generate_multiple_pdfs', 'generate_pdf2', export_orders_to_excel, export_invoice_total_amount]
 
     def generate_multiple_pdfs(self, request, queryset):
         selected_ids = queryset.values_list('id', flat=True)
