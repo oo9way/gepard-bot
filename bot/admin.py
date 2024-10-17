@@ -251,8 +251,13 @@ def export_invoice_total_amount(modeladmin, request, queryset):
 
     # Define the headers, based on your HTML structure
     ws.column_dimensions['A'].width = 20  # Полъзователи
+    ws.column_dimensions['B'].width = 35
+    ws.column_dimensions['C'].width = 20
+    ws.column_dimensions['D'].width = 20
+    ws.column_dimensions['E'].width = 20
+    ws.column_dimensions['F'].width = 20
     # Add each order's data to the workbook
-    col1 = ["Полъзователи", f"{", ".join([order.user.get_full_name() for order in queryset])}", "", ]
+    col1 = ["Полъзователи", f"{', '.join([order.user.get_full_name() for order in queryset])}", "", ]
     ws.append(col1)
     ws.append(["", "", "", "", "", ""])
 
@@ -263,7 +268,6 @@ def export_invoice_total_amount(modeladmin, request, queryset):
     # Append each row
     item_headers = ["#", "Название", "Количество в блоке", "Блок", "Кол-во", "Сумма"]
     ws.append(item_headers)
-    ws.append(["", "", "", "", "", ""])
     row_count = 3
     total_count = 0
     total_sum = 0
@@ -310,9 +314,10 @@ def export_invoice_total_amount(modeladmin, request, queryset):
 
             ws.append(item_data)
 
-            for col_num in range(1, len(item_data)):
+            for col_num in range(1, len(item_data) + 1):
                 cell = ws.cell(row=ws.max_row, column=col_num)
                 cell.alignment = Alignment(horizontal="right")
+                cell.border = border
 
             total_count += int(float(item.qty))
 
