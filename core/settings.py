@@ -146,7 +146,7 @@ STATICFILES_DIRS = (
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
-CSRF_TRUSTED_ORIGINS = ['https://gpadmin.joseph.uz']
+CSRF_TRUSTED_ORIGINS = ['https://gpadmin.joseph.uz', "https://0892-213-230-86-89.ngrok-free.app"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

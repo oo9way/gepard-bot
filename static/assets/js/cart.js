@@ -169,6 +169,14 @@ function updateCartDisplay() {
             <div class="col-2" style="align-items: center; justify-content: center; display: flex;">
                 <button onclick="deleteQuantity('${item.id}')" class="cart-delete-btn"><i class="fa fa-trash"></i></button>
             </div>
+            <div class="row">
+                <div class="col-6">
+                    <b>Количество</b>
+                </div>
+                <div class="col-6 align-right">
+                    <div>${item.amount}</div>
+                </div>
+            </div>
             <div class="col-2 pt-3 total-text">
                 Общий:
             </div>
@@ -178,6 +186,7 @@ function updateCartDisplay() {
                     <input type="hidden" name="productName" class="productName" value="${item.name}">
                     <input type="hidden" name="productPriceUzs" class="productPriceUzs" value="${item.price_uzs}">
                     <input type="hidden" name="productCover" class="productCover" value="${item.cover}">
+                    <input type="hidden" name="productTotalAmount" class="productTotalAmount" value="${item.amount}">
                     <div class="total-prices">
                         <div class="cart-total-uzs">${(item.price_uzs * item.qty).toLocaleString()} сум</div>
                     </div>
@@ -242,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Function to add an item to the cart
-    function addItem(productId, productName, amount, productPriceUzs, cover, fullUpdate = false, set = 1) {
+    function addItem(productId, productName, amount, productPriceUzs, cover, fullUpdate = false, set = 1, product_amoount = 0) {
         var currentCount = getItemCount(productId);
         var newCount = 0;
         if (fullUpdate){
@@ -257,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const newSet = (newCount / set).toFixed(2);
 
         if (itemIndex === -1) {
-            cart.push({ id: productId, name: productName, qty: newCount, set:newSet, price_uzs: productPriceUzs, cover:cover });
+            cart.push({ id: productId, name: productName, qty: newCount, set:newSet, price_uzs: productPriceUzs, cover:cover, amount:product_amoount});
         } else {
             cart[itemIndex].qty = newCount;
             cart[itemIndex].set = newSet;
@@ -351,8 +360,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var productPriceUzs = this.getAttribute('data-item-price-uzs');
             var productCover = this.getAttribute('data-item-cover');
             var productSet = this.getAttribute('data-item-set');
+            var amount = this.getAttribute('data-item-amount');
                 console.log("productSet", productSet)
-                addItem(productId, productName, 1, productPriceUzs, productCover, fullUpdate = false, productSet);
+                addItem(productId, productName, 1, productPriceUzs, productCover, fullUpdate = false, productSet, amount);
                 document.querySelector('.amountOfProduct').value = getItemCount(productId);
                 document.querySelector('.amountOfSet').value = (getItemCount(productId) / Number(productSet)).toFixed(2);
         });
@@ -379,6 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let productCover = document.querySelector(".productCover");
             let productSet = document.querySelector(".productSetAmount");
             let amount = String(document.querySelector(".amountOfProduct").value).replace(",", ".");
+            var product_amount = Number(document.querySelector(".productTotalAmount").value);
             
             if (productId){
                 productId = productId.value;
@@ -400,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 productCover = productCover.value;
             }
     
-            addItem(productId, productName, amount, productPriceUzs, productCover, fullUpdate = true, productSet); 
+            addItem(productId, productName, amount, productPriceUzs, productCover, fullUpdate = true, productSet, product_amount);
             document.querySelector('.amountOfSet').value = (getItemCount(productId) / Number(productSet)).toFixed(2);
         })
     }

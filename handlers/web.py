@@ -82,6 +82,7 @@ async def web_app_data(update: Update, context: CallbackContext, user: TelegramU
     client = await TelegramUser.objects.aget(id=context.user_data.get("client_id_for_order"))
     order.user = client
     order.agent = user
+    order.comment = data.get("comment")
     await order.asave()
     
     del context.user_data["client_for_order"]
