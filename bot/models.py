@@ -220,6 +220,9 @@ class Order(models.Model):
     director_approve_time = models.DateTimeField("Время утверждения директором", null=True, blank=True)
     storekeeper_approve_time = models.DateTimeField("Время одобрения кладовщика", null=True, blank=True)
     comment = models.TextField("Комментарий", null=True, blank=True)
+    is_accountant_confirm = models.BooleanField("Бухгалтер подтвердил?", default=False)
+    is_director_confirm = models.BooleanField("Директор подтвердил?", default=False)
+    is_storekeeper_confirm = models.BooleanField("Кладовщик подтвердил?", default=False)
 
     def clean(self) -> None:
         from django.core.exceptions import ValidationError

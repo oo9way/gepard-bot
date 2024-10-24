@@ -58,6 +58,7 @@ order_handler = ConversationHandler(
     states={
         states.CHOOSE_CLIENT: [
             CallbackQueryHandler(web.get_client),
+            MessageHandler(filters.TEXT, web.get_client)
         ],
         states.CHOOSE_PAYMENT: [
             CallbackQueryHandler(web.get_payment)
