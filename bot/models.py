@@ -234,6 +234,7 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         from bot.signals import make_order_message, send_notification
         if self.pk:
+            message = None
             if self.is_accountant_confirm and not self.accountant_approve_time:
                 self.accountant_approve_time = datetime.now()
                 self.status = Order.OrderStatus.APPROVED_BY_ACCOUNTANT
@@ -247,7 +248,7 @@ class Order(models.Model):
                 self.status = Order.OrderStatus.APPROVED_BY_STOREKEEPER
                 message = make_order_message(self, "storekeeper")
             
-            if self.agent.telegram_id:
+            if self.agent.telegram_id and message:
                 send_notification(self.agent.telegram_id, message)
         
         return super().save(*args, **kwargs)
