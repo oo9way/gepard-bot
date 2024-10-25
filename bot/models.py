@@ -241,13 +241,11 @@ class Order(models.Model):
             elif self.is_director_confirm and not self.director_approve_time:
                 self.director_approve_time = datetime.now()
                 self.status = Order.OrderStatus.APPROVED_BY_DIRECTOR
-                message = make_order_message(instance, "director")
+                message = make_order_message(self, "director")
             elif self.is_storekeeper_confirm and not self.storekeeper_approve_time:
                 self.storekeeper_approve_time = datetime.now()
                 self.status = Order.OrderStatus.APPROVED_BY_STOREKEEPER
-                
-                message = make_order_message(instance, "storekeeper")
-
+                message = make_order_message(self, "storekeeper")
             
             if instance.agent.telegram_id:
                 send_notification(instance.agent.telegram_id, message)
