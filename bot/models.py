@@ -249,7 +249,8 @@ class Order(models.Model):
             
             if self.agent.telegram_id:
                 send_notification(self.agent.telegram_id, message)
-
+        
+        return super().save(args, kwargs)
 
 
     class Meta:
