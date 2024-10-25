@@ -230,6 +230,28 @@ class Order(models.Model):
             raise ValidationError({"payment_type": "При изменении статуса платежа на «Оплачен» необходимо указать тип платежа."})
         return super().clean()
 
+    def save(self, *args, **kwargs):
+        from bot.signals import make_order_message, send_notification
+        if self.pk:
+            if self.is_accountant_confirm and not self.accountant_approve_time:
+                self.accountant_approve_time = datetime.now()
+                self.status = Order.OrderStatus.APPROVED_BY_ACCOUNTANT
+                message = make_order_message(self, "accountant")
+            elif self.is_director_confirm and not self.director_approve_time:
+                self.director_approve_time = datetime.now()
+                self.status = Order.OrderStatus.APPROVED_BY_DIRECTOR
+                message = make_order_message(instance, "director")
+            elif self.is_storekeeper_confirm and not self.storekeeper_approve_time:
+                self.storekeeper_approve_time = datetime.now()
+                self.status = Order.OrderStatus.APPROVED_BY_STOREKEEPER
+                
+                message = make_order_message(instance, "storekeeper")
+
+            
+            if instance.agent.telegram_id:
+                send_notification(instance.agent.telegram_id, message)
+
+
 
     class Meta:
         verbose_name = "Заказ"
