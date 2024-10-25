@@ -5,6 +5,7 @@ from django.core.management import call_command
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
 from uuid import uuid4
+from datetime import datetime
 
 
 class CustomUser(AbstractUser):
