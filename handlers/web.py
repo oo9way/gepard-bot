@@ -1,7 +1,7 @@
 from utils import get_user, update_or_create
 from keyboards import replies, inlines
 import json
-from telegram import Update
+from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import CallbackContext
 from bot.models import TelegramUser, Order, OrderItem, Product
 import states
@@ -82,6 +82,7 @@ async def web_app_data(update: Update, context: CallbackContext, user: TelegramU
     client = await TelegramUser.objects.aget(id=context.user_data.get("client_id_for_order"))
     order.user = client
     order.agent = user
+    order.comment = data.get("comment")
     await order.asave()
     
     del context.user_data["client_for_order"]
@@ -100,7 +101,9 @@ async def get_agent_client(update, context, user):
         message = "У вас нет клиентов"
         await update.message.reply_text(message, reply_markup=replies.get_agent_main())
         return -1
-        
+
+    delete_message = await update.message.reply_text(".", reply_markup=ReplyKeyboardRemove())
+    await delete_message.delete()
 
     message = "Выберите клиента"
     await update.message.reply_text(message, reply_markup=inlines.get_user_inline_keyboard(clients))
@@ -111,9 +114,15 @@ async def get_agent_client(update, context, user):
 
 @get_user
 async def get_client(update: Update, context: CallbackContext, user:TelegramUser) -> None:
+    if update.message:
+        return await get_agent_client(update, context)
+
     data = update.callback_query.data
     await update.callback_query.answer()
     await update.callback_query.delete_message()
+    if data == 'back':
+        await update.callback_query.message.reply_text("Выберите меню", reply_markup=replies.get_agent_main())
+        return -1
 
     client_id = data.split("_")[1]
     client = await TelegramUser.objects.aget(id=client_id)

@@ -355,7 +355,7 @@ class OrderAdmin(ImportExportModelAdmin):
     list_display = ("id", "user", "status",  "get_total_cost", "location_path")
     list_per_page = 20
     inlines = (OrderItemTabularInline, )
-    fields = ("user", "status", "payment_status", "payment_type")
+    fields = ("user", "status", "payment_status", "payment_type", "comment", "is_accountant_confirm", "is_director_confirm", "is_storekeeper_confirm")
     list_filter = ("user", "agent", "status", "payment_status", "user__territory",)
     search_fields = ("id",)
     date_hierarchy = "created_at"
@@ -393,16 +393,22 @@ class OrderAdmin(ImportExportModelAdmin):
             return [field.name for field in self.model._meta.fields]
         
         if request.user.role == "accountant":
-            if obj.status != "pending":
-                return ("status", "user")
+            if obj.status != "pending" or not obj.is_accountant_confirm:
+                return ("status", "user", "is_storekeeper_confirm", "is_director_confirm")
+            if obj.is_accountant_confirm:
+                return ('user', "status", "is_accountant_confirm", "is_storekeeper_confirm", "is_director_confirm")
             return ("user", )
             
         if request.user.role == "director":
-            if obj.status != "approved_by_account":
-                return ("status", "user", "payment_status", "payment_type")
+            if obj.is_director_confirm:
+                return ("status", "user", "payment_status", "payment_type", "is_accountant_confirm", "is_director_confirm", "is_storekeeper_confirm")
+            if obj.status != "approved_by_account" or not obj.is_director_confirm:
+                return ("status", "user", "payment_status", "payment_type", "is_accountant_confirm", "is_storekeeper_confirm")
             return ("user", )
         
         if request.user.role == "storekeeper":
+            if obj.is_storekeeper_confirm:
+                return ("status", "user", "is_storekeeper_confirm")
             if obj.status != "approved_by_director":
                 return ("status", "user")
             return ("user", )
@@ -411,7 +417,7 @@ class OrderAdmin(ImportExportModelAdmin):
     
     def get_fields(self, request: HttpRequest, obj: Any | None = ...) -> Sequence[Callable[..., Any] | str]:
         if request.user.role == "storekeeper":
-            return ("status", "user",)
+            return ("status", "user", "is_storekeeper_confirm")
         return super().get_fields(request, obj)
 
 

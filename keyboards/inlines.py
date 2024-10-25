@@ -4,8 +4,10 @@ from bot.models import Order
 def get_user_inline_keyboard(users):
     keyboard = []
     for user in users:
-        button = InlineKeyboardButton(text=f"{user.first_name} {user.last_name}", callback_data=f"order_{user.id}")
+        button = InlineKeyboardButton(text=f"{user.first_name} {user.last_name or ''}", callback_data=f"order_{user.id}")
         keyboard.append([button])
+
+    keyboard.append([InlineKeyboardButton("Назад", callback_data="back")])
     return InlineKeyboardMarkup(keyboard)
 
 

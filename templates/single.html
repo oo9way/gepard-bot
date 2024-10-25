@@ -45,12 +45,14 @@
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
                     const data = JSON.parse(localStorage.getItem('cart'));
+                    var comment = document.getElementById('comment').value;
     
                     // Create request object to send
                     const request = {
                         "data": data, 
                         "longitude": longitude,
-                        "latitude": latitude
+                        "latitude": latitude,
+                        "comment": comment
                     };
     
                     // Send request data to Telegram
@@ -93,6 +95,9 @@
         </div>
         <div class="modal-body">
           <ul id="cartList"></ul>
+          <div class="form-group mx-2">
+              <textarea class="form-control" id="comment" rows="3" maxlength="500" placeholder="Комментарий к заказу"></textarea>
+          </div>
         </div>
         <div class="modal-footer">
             <h3>Общий <span id="totalPrice">0</span> сум</h3>
@@ -190,6 +195,7 @@
                             data-item-price-uzs="{{product.price_uzs}}" 
                             data-item-cover="{{product.cover.url}}"
                             data-item-set="{{product.set_amount}}"
+                            data-item-amount="{{ product.amount }}"
                             class="add-cart">+</button>
                     </div>
                 </div>
