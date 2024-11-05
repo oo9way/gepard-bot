@@ -36,7 +36,6 @@ class CustomUser(AbstractUser):
             else:
                 groups = Group.objects.filter(name="keeper")
                 self.groups.set(groups)
-            
 
     def __str__(self):
         return self.username
@@ -48,7 +47,8 @@ class ClientCategory(models.Model):
         DECREASE = "decrease", "Вычесть"
 
     name = models.CharField("Название", max_length=255)
-    action = models.CharField("Добавить/вычесть цену", choices=ActionTypes.choices, default=ActionTypes.INCREASE, max_length=255)
+    action = models.CharField("Добавить/вычесть цену", choices=ActionTypes.choices, default=ActionTypes.INCREASE,
+                              max_length=255)
     amount_uzs = models.CharField("Сумма UZS", max_length=255)
     amount_usd = models.CharField("Сумма USD", max_length=255)
 
@@ -80,7 +80,8 @@ class TelegramUser(models.Model):
     is_updated = models.BooleanField(editable=False, default=False)
     tin = models.CharField("ИНН", null=True, blank=True, max_length=255)
     limit = models.FloatField("Сумма лимит (UZS)", default=0)
-    category = models.CharField(verbose_name="Категория клиента", null=True, blank=True, max_length=255, choices=UserCategory.choices)
+    category = models.CharField(verbose_name="Категория клиента", null=True, blank=True, max_length=255,
+                                choices=UserCategory.choices)
     territory = models.ManyToManyField("Area", verbose_name="Территория", null=True, blank=True)
 
     def clean(self) -> None:
@@ -89,9 +90,9 @@ class TelegramUser(models.Model):
                 "tin": "ИНН и номер договора обязательны.",
                 "contract_id": "ИНН и номер договора обязательны."
             })
-        
+
         return super().clean()
-    
+
     def save(self, *args, **kwargs):
         if not self.telegram_id:
             self.telegram_id = uuid4()
@@ -103,10 +104,10 @@ class TelegramUser(models.Model):
         last_name = self.last_name if self.last_name else ""
 
         return f"{first_name} {last_name}"
-    
+
     def __str__(self) -> str:
         return self.get_full_name()
-    
+
     class Meta:
         verbose_name = "Клиент"
         verbose_name_plural = "Клиенты"
@@ -136,11 +137,11 @@ class Product(models.Model):
     cover = models.ImageField("Изображение продукта", upload_to="products")
     title = models.CharField("Название продукта", max_length=255)
     category = models.ForeignKey(
-        Category, 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True, 
-        related_name="products", 
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="products",
         verbose_name="Категория"
     )
     description = models.TextField("Комментарий")
@@ -150,19 +151,18 @@ class Product(models.Model):
 
     price_uzs_a = models.FloatField("Стандарт Цена (сум)", default=0)
     price_usd_a = models.FloatField("Стандарт Цена (долл. США)", default=0, editable=False)
-    
+
     price_uzs_b = models.FloatField("-4% Цена (сум)", default=0)
     price_usd_b = models.FloatField("-4% Цена (долл. США)", default=0, editable=False)
-    
+
     price_uzs_c = models.FloatField("Хорека Цена (сум)", default=0)
     price_usd_c = models.FloatField("Хорека Цена (долл. США)", default=0, editable=False)
-    
+
     price_uzs_d = models.FloatField("Оптовик Цена (сум)", default=0)
     price_usd_d = models.FloatField("Оптовик Цена (долл. США)", default=0, editable=False)
-    
+
     price_uzs_e = models.FloatField("-2% Цена (сум)", default=0)
     price_usd_e = models.FloatField("-2% Цена (долл. США)", default=0, editable=False)
-    
 
     amount = models.FloatField("Количество", default=0)
     set_amount = models.FloatField("Количество в блоке", default=0)
@@ -211,8 +211,10 @@ class Order(models.Model):
         APPROVED_BY_STOREKEEPER = "approved_by_storekeeper", "Подтверждено кладовщиком"
 
     user = models.ForeignKey(verbose_name="Клиент", to=TelegramUser, on_delete=models.SET_NULL, null=True, blank=True)
-    agent = models.ForeignKey(verbose_name="Agent", to=TelegramUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="orders")
-    payment_status = models.CharField("Статус платежа", choices=PaymentStatus.choices, default=PaymentStatus.UNPAID, max_length=16)
+    agent = models.ForeignKey(verbose_name="Agent", to=TelegramUser, on_delete=models.SET_NULL, null=True, blank=True,
+                              related_name="orders")
+    payment_status = models.CharField("Статус платежа", choices=PaymentStatus.choices, default=PaymentStatus.UNPAID,
+                                      max_length=16)
     payment_type = models.CharField("Тип платежа", choices=PaymentTypes.choices, null=True, blank=True, max_length=16)
     status = models.CharField("Статус заказа", max_length=24, choices=OrderStatus.choices, default=OrderStatus.PENDING)
     created_at = models.DateTimeField("Время размещения заказа", auto_now=True)
@@ -228,7 +230,8 @@ class Order(models.Model):
     def clean(self) -> None:
         from django.core.exceptions import ValidationError
         if self.payment_status == "paid" and not self.payment_type:
-            raise ValidationError({"payment_type": "При изменении статуса платежа на «Оплачен» необходимо указать тип платежа."})
+            raise ValidationError(
+                {"payment_type": "При изменении статуса платежа на «Оплачен» необходимо указать тип платежа."})
         return super().clean()
 
     def save(self, *args, **kwargs):
@@ -247,17 +250,15 @@ class Order(models.Model):
                 self.storekeeper_approve_time = datetime.now()
                 self.status = Order.OrderStatus.APPROVED_BY_STOREKEEPER
                 message = make_order_message(self, "storekeeper")
-            
+
             if self.agent and self.agent.telegram_id and message:
                 send_notification(self.agent.telegram_id, message)
-        
-        return super().save(*args, **kwargs)
 
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
-
 
 
 class OrderItem(models.Model):
@@ -277,13 +278,12 @@ class OrderItem(models.Model):
             return f"{product.amount} dona"
         except:
             return f"0x0"
-        
+
     get_real_qty.short_description = "Oстатка"
-        
+
     class Meta:
         verbose_name = "Заказанные продукты"
         verbose_name_plural = "Заказанные продукты"
-
 
 
 class Area(models.Model):
@@ -295,4 +295,3 @@ class Area(models.Model):
 
     def __str__(self) -> str:
         return f"{self.pk}. {self.name}"
-    

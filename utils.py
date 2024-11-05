@@ -1,7 +1,10 @@
 from functools import wraps
-from telegram import Update
-from bot.models import TelegramUser
+
 from asgiref.sync import sync_to_async
+from telegram import Update
+
+from bot.models import TelegramUser
+
 
 def get_user(handler):
     @wraps(handler)
@@ -25,9 +28,9 @@ def get_user(handler):
         except Exception as e:
             print(e)
             user = await TelegramUser.objects.acreate(**user_data)
-        
+
         return await handler(update, context, user, *args, **kwargs)
-    
+
     return wrapper
 
 
@@ -39,3 +42,20 @@ async def get_solo(model):
 def update_or_create(model, params, defaults):
     obj, created = model.objects.update_or_create(**params, defaults=defaults)
     return obj, created
+
+
+from openpyxl import load_workbook
+
+
+def import_data():
+    workbook = load_workbook(filename="dumb.xlsx")
+    sheet = workbook.active
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        id, name, size, price_uzs_c, price_uzs_a, price_uzs_e, price_uzs_b, price_uzs_d = row
+        price_uzs_a = str(price_uzs_a).replace(',00', '').replace(' ', '')
+        price_uzs_b = str(price_uzs_b).replace(',00', '').replace(' ', '')
+        price_uzs_c = str(price_uzs_c).replace(',00', '').replace(' ', '')
+        price_uzs_d = str(price_uzs_d).replace(',00', '').replace(' ', '')
+        price_uzs_e = str(price_uzs_e).replace(',00', '').replace(' ', '')
+        Product.objects.create(title=name, price_uzs_a=price_uzs_a, price_uzs_b=price_uzs_b, price_uzs_c=price_uzs_c,
+                               price_uzs_d=price_uzs_d, price_uzs_e=price_uzs_e)

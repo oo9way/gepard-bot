@@ -11,7 +11,6 @@ from import_export.admin import ImportExportModelAdmin
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group
 
-
 admin.site.unregister(Group)
 
 
@@ -24,7 +23,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ("id", "username", "first_name", "last_name", "role", )
+    list_display = ("id", "username", "first_name", "last_name", "role",)
     fields = ("username", "first_name", "last_name", "role")
     list_display_links = list_display
 
@@ -32,39 +31,39 @@ class CustomUserAdmin(admin.ModelAdmin):
         if not obj:
             return ("username", "first_name", "last_name", "role", "password")
         return super().get_fields(request, obj)
-    
+
     def has_delete_permission(self, request: HttpRequest, obj=None):
         if obj and obj.is_superuser and not request.user.is_superuser:
             return False
         return True
 
-    
 
 admin.site.register(Contact, SingletonModelAdmin)
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "is_active", "price_uzs_a", 
-                    "price_uzs_b","price_uzs_c", "price_uzs_d", "price_uzs_e", "amount")
-    list_editable = ('is_active', "price_uzs_a", "price_uzs_b","price_uzs_c", "price_uzs_d", "price_uzs_e", "amount")
+    list_display = ("id", "title", "is_active", "price_uzs_a",
+                    "price_uzs_b", "price_uzs_c", "price_uzs_d", "price_uzs_e", "amount")
+    list_editable = ('is_active', "price_uzs_a", "price_uzs_b", "price_uzs_c", "price_uzs_d", "price_uzs_e", "amount")
     list_display_links = ("id", "title",)
     list_filter = ("category", "is_active")
-    search_fields = ("title", )
-
+    search_fields = ("title",)
 
 
 from bot.resources import UsersTableResourse, OrderResource
 
+
 @admin.register(TelegramUser)
 class TelegramUserAdmin(ImportExportModelAdmin):
     list_display = ("id", "first_name", "username", "tin", "is_agent", "phone", "category")
-    list_display_links =  ("id", "first_name", "username", "phone", "category")
-    list_editable = ("is_agent", )
+    list_display_links = ("id", "first_name", "username", "phone", "category")
+    list_editable = ("is_agent",)
     list_filter = ("category", "is_agent", "is_active")
-    resource_classes = (UsersTableResourse, )
+    resource_classes = (UsersTableResourse,)
     skip_export_form = True
     search_fields = ("tin", "first_name", "username", "phone")
     readonly_fields = ("telegram_id", "phone")
-
 
 
 class OrderItemTabularInline(admin.TabularInline):
@@ -74,21 +73,22 @@ class OrderItemTabularInline(admin.TabularInline):
 
     def get_fields(self, request, obj=None):
         return ['product_name', 'product_in_set', 'qty', 'set_amount', 'price_uzs', 'get_real_qty']
-    
+
     def has_delete_permission(self, request, obj=None) -> bool:
         return False
-    
+
     def has_change_permission(self, request: HttpRequest, obj=None) -> bool:
         return False
-    
+
     def has_add_permission(self, *args):
-        return False    
+        return False
 
 
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Side, Border
 from django.utils.timezone import localtime
 from django.http import HttpResponse
+
 
 def export_orders_to_excel(modeladmin, request, queryset):
     # Create a new workbook and get the active worksheet
@@ -115,7 +115,6 @@ def export_orders_to_excel(modeladmin, request, queryset):
     ws.column_dimensions['J'].width = 15  # Тип оплаты
     ws.column_dimensions['K'].width = 25  # Адрес
     ws.column_dimensions['L'].width = 18  # Телефон
-    
 
     # Add each order's data to the workbook
     row_count = 0
@@ -125,13 +124,14 @@ def export_orders_to_excel(modeladmin, request, queryset):
             ws.append(["", "", "", "", "", ""])
             ws.append(["", "", "", "", "", ""])
 
-        col1 = ["Номер накладной", f"#{str(order.id).zfill(6)}", "", "Tорговый представитель", f"{order.agent.first_name} {order.agent.last_name}"]
+        col1 = ["Номер накладной", f"#{str(order.id).zfill(6)}", "", "Tорговый представитель",
+                f"{order.agent.first_name} {order.agent.last_name}"]
         col2 = ["Поставщик", "", "", "Телефон представителя:", order.agent.phone if order.agent else "-"]
         col3 = ["Дата отргрузки", "", "", "Контрагент:", f"{order.user.first_name} {order.user.last_name}"]
         col4 = ["Дата консигнации", "", "", "Тип оплаты", order.get_payment_type_display()]
         col5 = ["Доставщик", "", "", "Адрес", order.user.territory.first().name]
-        col6 = ["Время заказа", str(order.created_at.strftime("%d.%m.%Y %H:%M:%S")), "", "Телефон", str(order.user.phone if order.user.phone else "")]
-
+        col6 = ["Время заказа", str(order.created_at.strftime("%d.%m.%Y %H:%M:%S")), "", "Телефон",
+                str(order.user.phone if order.user.phone else "")]
 
         # Append each row
         ws.append(col1)
@@ -142,8 +142,8 @@ def export_orders_to_excel(modeladmin, request, queryset):
         ws.append(col6)
         ws.append(["", "", "", "", "", ""])
         ws.append(["", "", "", "", "", ""])
-        
-        for row in range(row_count or 1, row_count+7):
+
+        for row in range(row_count or 1, row_count + 7):
             ws[f"A{row}"].font = Font(bold=True)
             ws[f"D{row}"].font = Font(bold=True)
 
@@ -180,7 +180,7 @@ def export_orders_to_excel(modeladmin, request, queryset):
 
         items_count = order.items.all().count()
         row_count += items_count
-    
+
         ws.merge_cells(f"A{row_count + 1}:E{row_count + 1}")
         ws.merge_cells(f"A{row_count + 2}:E{row_count + 2}")
         ws.merge_cells(f"A{row_count + 3}:E{row_count + 3}")
@@ -191,30 +191,29 @@ def export_orders_to_excel(modeladmin, request, queryset):
         ws[f"A{row_count + 1}"].alignment = Alignment(horizontal="right", vertical="center")
         ws[f"A{row_count + 2}"].alignment = Alignment(horizontal="right", vertical="center")
         ws[f"A{row_count + 3}"].alignment = Alignment(horizontal="right", vertical="center")
-        ws[f"A{row_count + 1}"].font =  Font(bold=True)
-        ws[f"A{row_count + 2}"].font =  Font(bold=True)
-        ws[f"A{row_count + 3}"].font =  Font(bold=True)
-        
+        ws[f"A{row_count + 1}"].font = Font(bold=True)
+        ws[f"A{row_count + 2}"].font = Font(bold=True)
+        ws[f"A{row_count + 3}"].font = Font(bold=True)
+
         ws[f"F{row_count + 1}"] = total_sum
         ws[f"F{row_count + 1}"].number_format = '# ##0'
 
         ws.append([])  # Blank row for separation
 
-
         fill = PatternFill(start_color="efefef", end_color="efefef", fill_type="solid")
         thin = Side(border_style="thin", color="000000")
         border = Border(left=thin, right=thin, top=thin, bottom=thin)
-        
-        for row in ws[f"A{row_count - items_count}:F{row_count+3}"]:
+
+        for row in ws[f"A{row_count - items_count}:F{row_count + 3}"]:
             for cell in row:
                 cell.border = border
 
         for row in ws[f"A{row_count - items_count}:F{row_count - items_count}"]:
             for cell in row:
                 cell.fill = fill
-                cell.font =  Font(bold=True)
+                cell.font = Font(bold=True)
 
-        for row in ws[f"A{row_count + 1}:F{row_count+3}"]:
+        for row in ws[f"A{row_count + 1}:F{row_count + 3}"]:
             for cell in row:
                 cell.fill = fill
 
@@ -239,6 +238,7 @@ def export_orders_to_excel(modeladmin, request, queryset):
     response["Content-Disposition"] = 'attachment; filename="orders.xlsx"'
     wb.save(response)
     return response
+
 
 export_orders_to_excel.short_description = "Накладная для заказа (Excel)"
 
@@ -339,7 +339,6 @@ def export_invoice_total_amount(modeladmin, request, queryset):
             cell.fill = fill
             cell.font = Font(bold=True)
 
-
     # Set up the HTTP response with the generated Excel file
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -348,14 +347,18 @@ def export_invoice_total_amount(modeladmin, request, queryset):
     wb.save(response)
     return response
 
+
 export_invoice_total_amount.short_description = "Накладная общая сумма (Excel)"
+
 
 @admin.register(Order)
 class OrderAdmin(ImportExportModelAdmin):
-    list_display = ("id", "user", "status",  "get_total_cost", "location_path")
+    list_display = ("id", "user", "status", "get_total_cost", "location_path")
     list_per_page = 20
-    inlines = (OrderItemTabularInline, )
-    fields = ("user", "status", "payment_status", "payment_type", "comment", "is_accountant_confirm", "is_director_confirm", "is_storekeeper_confirm")
+    inlines = (OrderItemTabularInline,)
+    fields = (
+    "user", "status", "payment_status", "payment_type", "comment", "is_accountant_confirm", "is_director_confirm",
+    "is_storekeeper_confirm")
     list_filter = ("user", "agent", "status", "payment_status", "user__territory",)
     search_fields = ("id",)
     date_hierarchy = "created_at"
@@ -386,78 +389,93 @@ class OrderAdmin(ImportExportModelAdmin):
         for order in queryset:
             for product in order.items.all():
                 p = Product.objects.filter(title__icontains=product.product_name).last()
-                product.product_id = p.pk if p else 0 
+                product.product_id = p.pk if p else 0
 
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.status == "cancelled":
             return [field.name for field in self.model._meta.fields]
-        
+
         if request.user.role == "accountant":
             if obj.status != "pending" or not obj.is_accountant_confirm:
                 return ("status", "user", "is_storekeeper_confirm", "is_director_confirm")
             if obj.is_accountant_confirm:
                 return ('user', "status", "is_accountant_confirm", "is_storekeeper_confirm", "is_director_confirm")
-            return ("user", )
-            
+            return ("user",)
+
         if request.user.role == "director":
             if obj.is_director_confirm:
-                return ("status", "user", "payment_status", "payment_type", "is_accountant_confirm", "is_director_confirm", "is_storekeeper_confirm")
+                return (
+                "status", "user", "payment_status", "payment_type", "is_accountant_confirm", "is_director_confirm",
+                "is_storekeeper_confirm")
             if obj.status != "approved_by_account" or not obj.is_director_confirm:
-                return ("status", "user", "payment_status", "payment_type", "is_accountant_confirm", "is_storekeeper_confirm")
-            return ("user", )
-        
+                return (
+                "status", "user", "payment_status", "payment_type", "is_accountant_confirm", "is_storekeeper_confirm")
+            return ("user",)
+
         if request.user.role == "storekeeper":
             if obj.is_storekeeper_confirm:
                 return ("status", "user", "is_storekeeper_confirm")
             if obj.status != "approved_by_director":
                 return ("status", "user")
-            return ("user", )
-            
-        return ("user", "status", "payment_status", "payment_type", "comment", "is_accountant_confirm", "is_director_confirm", "is_storekeeper_confirm")
-    
-    def get_fields(self, request: HttpRequest, obj: Any | None = ...) -> Sequence[Callable[..., Any] | str]:
+            return ("user",)
+
+        return (
+        "user", "status", "payment_status", "payment_type", "comment", "is_accountant_confirm", "is_director_confirm",
+        "is_storekeeper_confirm")
+
+    def get_fields(self, request: HttpRequest, obj=None):
         if request.user.role == "storekeeper":
             return ("status", "user", "is_storekeeper_confirm")
         return super().get_fields(request, obj)
 
-
     def get_list_display(self, request):
         if request.user.role == "accountant":
-            return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
-        
+            return (
+            "id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at",
+            "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
+
         if request.user.role == "director":
-            return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
-        
+            return (
+            "id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at",
+            "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
+
         if request.user.role == "storekeeper":
-            return ("id", "user", "status", "get_total_cost", "get_location",  "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
-        
-        return ("id", "user", "agent", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
+            return (
+            "id", "user", "status", "get_total_cost", "get_location", "created_at", "get_accountant_approve_time",
+            "get_director_approve_time", "get_storekeeper_approve_time")
+
+        return ("id", "user", "agent", "status", "get_total_cost", "payment_status", "payment_type", "get_location",
+                "created_at", "get_accountant_approve_time", "get_director_approve_time",
+                "get_storekeeper_approve_time")
 
     def get_accountant_approve_time(self, obj):
         if obj and obj.status == "cancelled" and obj.accountant_approve_time:
-            return format_html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg> Отменено')
-        return format_html(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.accountant_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.accountant_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
+            return format_html(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg> Отменено')
+        return format_html(
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.accountant_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.accountant_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
 
     get_accountant_approve_time.short_description = "Бухгалтер"
 
     def get_director_approve_time(self, obj):
         if obj and obj.status == "cancelled" and obj.director_approve_time:
-            return format_html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg> Отменено')
-        return format_html(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.director_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.director_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
-
+            return format_html(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg> Отменено')
+        return format_html(
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.director_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.director_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
 
     get_director_approve_time.short_description = "Директор"
 
     def get_storekeeper_approve_time(self, obj):
-        return format_html(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.storekeeper_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.storekeeper_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
-
+        return format_html(
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="green"/><path fill="none" stroke="white" stroke-width="2" d="M6 12l4 4l8-8" /></svg> Подтвержденный <br>{obj.storekeeper_approve_time.strftime("%d.%m.%Y %H:%M:%S")}' if obj.storekeeper_approve_time else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="red"/><path fill="none" stroke="white" stroke-width="2" d="M6 6l12 12M6 18L18 6" /></svg>')
 
     get_storekeeper_approve_time.short_description = "Кладовщик"
-    
+
     def formfield_for_choice_field(self, db_field, request, **kwargs):
         if db_field.name == 'status':
             if request.user.role == "accountant":
-                kwargs['choices'] = Order.AccountantStatus.choices 
+                kwargs['choices'] = Order.AccountantStatus.choices
             elif request.user.role == "director":
                 kwargs['choices'] = Order.DirectorStatus.choices
             else:
@@ -467,20 +485,20 @@ class OrderAdmin(ImportExportModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = queryset.annotate(total_price=Sum(F('items__price_uzs') * F('items__qty'), output_field=FloatField()))
+        queryset = queryset.annotate(
+            total_price=Sum(F('items__price_uzs') * F('items__qty'), output_field=FloatField()))
         if request.user.role == "director":
             queryset = queryset.exclude(status="pending")
 
         if request.user.role == "storekeeper":
             queryset = queryset.exclude(Q(status="pending") | Q(status="approved_by_account"))
         return queryset
-    
+
     def has_delete_permission(self, request, obj=None):
         return False
-    
-    def has_add_permission(self, request):
-        return False    
 
+    def has_add_permission(self, request):
+        return False
 
     def get_total_cost(self, obj):
         return f"{(obj.total_price):,}" if obj.total_price else 0
@@ -492,10 +510,12 @@ class OrderAdmin(ImportExportModelAdmin):
             return format_html(
                 f"<a href='{obj.location_path}'>Посмотреть место нахождения</a>"
             )
+
     get_location.short_description = "Место нахождения"
 
-    list_display_links = ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
-
+    list_display_links = (
+    "id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at",
+    "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
 
 
 @admin.register(Area)
@@ -503,4 +523,3 @@ class AreaAdmin(admin.ModelAdmin):
     list_display = ("id", "name",)
     search_fields = ("name",)
     list_display_links = list_display
-
