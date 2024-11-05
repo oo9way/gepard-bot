@@ -248,7 +248,7 @@ class Order(models.Model):
                 self.status = Order.OrderStatus.APPROVED_BY_STOREKEEPER
                 message = make_order_message(self, "storekeeper")
             
-            if self.agent.telegram_id and message:
+            if self.agent and self.agent.telegram_id and message:
                 send_notification(self.agent.telegram_id, message)
         
         return super().save(*args, **kwargs)
