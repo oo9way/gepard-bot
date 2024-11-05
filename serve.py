@@ -18,6 +18,21 @@ import states
 
 app = FastAPI()
 
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://f81ca4c0e42363fe6c053619db5cb757@o4506380788695040.ingest.us.sentry.io/4508244729135104",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    _experiments={
+        # Set continuous_profiling_auto_start to True
+        # to automatically start the profiler on when
+        # possible.
+        "continuous_profiling_auto_start": True,
+    },
+)
+
 
 # Store bot applications in a dictionary
 applications = {}
@@ -92,6 +107,11 @@ async def on_startup():
     
     for token in bot_tokens:
         await setup_bot(token)
+
+
+@app.get("/sentry-debug")
+async def trigger_error():
+    division_by_zero = 1 / 0
 
 
 @app.post("/webhook")
