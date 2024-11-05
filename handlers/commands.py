@@ -17,7 +17,8 @@ async def start(update, context, user):
         return await update.message.reply_text(
             message, reply_markup=replies.get_agent_main()
         )
-    return await update.message.reply_text(message, reply_markup=replies.get_main())
+    await update.message.reply_text(message, reply_markup=replies.get_main())
+    return -1
 
 
 @get_user

@@ -61,7 +61,9 @@ conversation_handler = ConversationHandler(
         states.GET_FULL_NAME: [MessageHandler(filters.TEXT, parameters.get_full_name)],
         states.GET_PHONE: [MessageHandler(filters.TEXT, parameters.get_phone)],
     },
-    fallbacks=[]
+    fallbacks=[
+        CommandHandler("start", commands.start)
+    ]
 )
 
 order_handler = ConversationHandler(
@@ -89,11 +91,12 @@ order_handler = ConversationHandler(
 
 async def setup_bot(token: str):
     application = Application.builder().token(token).build()
+    application.add_handler(order_handler)
     application.add_handler(CommandHandler("start", commands.start))
     application.add_handler(CommandHandler("category", commands.category))
     application.add_handler(MessageHandler(filters.Text("📞 Связаться с нами"), common.contact))
     application.add_handler(conversation_handler)
-    application.add_handler(order_handler)
+    
     
     applications[token] = application
 
