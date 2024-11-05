@@ -21,7 +21,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+def trigger_error(request):
+    division_by_zero = 1 / 0
+
+
 urlpatterns = [
+    path('sentry-debug/', trigger_error),
     path('webapp/', views.WebAppTemplateView.as_view(), name="list"),
     # path('webapp/', views.WebAppHomePage.as_view(), name="list"),
     path("webapp/<int:pk>/", views.WebAppDetailPage.as_view(), name="detail"),
