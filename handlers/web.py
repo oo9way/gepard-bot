@@ -150,6 +150,8 @@ async def get_payment(update: Update, context: CallbackContext, user:TelegramUse
     await order.asave()
     await update.callback_query.delete_message()
 
+    user = await TelegramUser.objects.aget(id=order.user_id)
+
     message = "<b>Заказ выполнен успешно</b>\n"
     message += f"<b>Клиент:</b> {user.first_name} {user.last_name}\n"
     message += f"<b>Статус:</b> {order.get_status_display()}\n"
@@ -161,7 +163,7 @@ async def get_payment(update: Update, context: CallbackContext, user:TelegramUse
         message += f"{item.product_name} - {item.qty} шт. {item.set_amount} блок\n"
     message += "\n=====================\n"
     message += f"<b>Общая сумма (UZS):</b> {total_sum_uzs:,}\n"
-    user = await TelegramUser.objects.aget(id=order.user_id)
+    
     if total_sum_uzs > user.limit:
         order.adelete()
         message = "Заказ отменен, так как баланс клиента превысил лимит"

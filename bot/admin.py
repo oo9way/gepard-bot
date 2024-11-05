@@ -431,7 +431,7 @@ class OrderAdmin(ImportExportModelAdmin):
         if request.user.role == "storekeeper":
             return ("id", "user", "status", "get_total_cost", "get_location",  "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
         
-        return ("id", "user", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
+        return ("id", "user", "agent", "status", "get_total_cost", "payment_status", "payment_type", "get_location", "created_at", "get_accountant_approve_time", "get_director_approve_time", "get_storekeeper_approve_time")
 
     def get_accountant_approve_time(self, obj):
         if obj and obj.status == "cancelled" and obj.accountant_approve_time:

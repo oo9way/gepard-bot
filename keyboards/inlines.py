@@ -15,9 +15,6 @@ def create_payment_keyboard():
     PaymentTypes = Order.PaymentTypes
     keyboard = [
         [InlineKeyboardButton(PaymentTypes.CASH.label, callback_data=PaymentTypes.CASH.value)],
-        [InlineKeyboardButton(PaymentTypes.PAYME.label, callback_data=PaymentTypes.PAYME.value)],
-        [InlineKeyboardButton(PaymentTypes.CLICK.label, callback_data=PaymentTypes.CLICK.value)],
-        [InlineKeyboardButton(PaymentTypes.TERMINAL.label, callback_data=PaymentTypes.TERMINAL.value)],
         [InlineKeyboardButton(PaymentTypes.TRANSFER.label, callback_data=PaymentTypes.TRANSFER.value)],
         [InlineKeyboardButton(PaymentTypes.OTHER.label, callback_data=PaymentTypes.OTHER.value)]
     ]
