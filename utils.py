@@ -48,6 +48,7 @@ from openpyxl import load_workbook
 
 
 def import_data():
+    from bot.models import Product
     workbook = load_workbook(filename="dumb.xlsx")
     sheet = workbook.active
     for row in sheet.iter_rows(min_row=2, values_only=True):
