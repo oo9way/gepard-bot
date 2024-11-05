@@ -413,7 +413,7 @@ class OrderAdmin(ImportExportModelAdmin):
                 return ("status", "user")
             return ("user", )
             
-        return super().get_readonly_fields(request, obj)
+        return ("user", "status", "payment_status", "payment_type", "comment", "is_accountant_confirm", "is_director_confirm", "is_storekeeper_confirm")
     
     def get_fields(self, request: HttpRequest, obj: Any | None = ...) -> Sequence[Callable[..., Any] | str]:
         if request.user.role == "storekeeper":
