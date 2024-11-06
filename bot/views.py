@@ -5,7 +5,6 @@ from bot.models import Product, Category, TelegramUser
 from django.db.models import Q, F
 
 
-
 class WebAppTemplateView(ListView):
     model = Product
     context_object_name = "products"
@@ -14,11 +13,11 @@ class WebAppTemplateView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         query = self.request.GET.get('q')
-        user_id= self.request.GET.get("user_id", None)
+        user_id = self.request.GET.get("user_id", None)
 
         if query:
             queryset = queryset.filter(title__icontains=query)
-        
+
         if user_id and user_id != "None":
             category = TelegramUser.objects.get(pk=user_id).category
 
@@ -40,12 +39,12 @@ class WebAppTemplateView(ListView):
 
         else:
             queryset = queryset.extra(
-                    select={
-                        'price_uzs': f'price_uzs_a',
-                        'price_usd': f'price_usd_a'
-                    }
-                )
-            
+                select={
+                    'price_uzs': f'price_uzs_a',
+                    'price_usd': f'price_usd_a'
+                }
+            )
+
         cat = self.request.GET.get("cate", None)
         if cat and (not user_id or user_id == "None"):
             queryset = queryset.extra(
@@ -56,9 +55,9 @@ class WebAppTemplateView(ListView):
             )
 
         return queryset
-    
+
     def get_context_data(self, **kwargs: Any):
-        context =  super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['user_id'] = self.request.GET.get("user_id", None)
         context['cate'] = self.request.GET.get("cate", "a")
         context['preview'] = self.request.GET.get("preview") == "1"
@@ -66,7 +65,7 @@ class WebAppTemplateView(ListView):
         context['top'] = Product.objects.filter(is_top=True)
         context['prev_val'] = self.request.GET.get("preview")
         return context
-    
+
 
 class WebAppHomePage(ListView):
     model = Product
@@ -79,9 +78,9 @@ class WebAppHomePage(ListView):
         if query:
             queryset = queryset.filter(title__icontains=query)
         return queryset
-    
+
     def get_context_data(self, **kwargs: Any):
-        context =  super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         context['top'] = Product.objects.filter(is_top=True)
         context['prev_val'] = self.request.GET.get("preview")
@@ -118,11 +117,11 @@ class WebAppCategoryPage(ListView):
 
         else:
             queryset = queryset.extra(
-                    select={
-                        'price_uzs': f'price_uzs_a',
-                        'price_usd': f'price_usd_a'
-                    }
-                )
+                select={
+                    'price_uzs': f'price_uzs_a',
+                    'price_usd': f'price_usd_a'
+                }
+            )
 
         cat = self.request.GET.get("cate", None)
         if cat and (not user_id or user_id == "None"):
@@ -134,7 +133,7 @@ class WebAppCategoryPage(ListView):
             )
 
         return queryset
-    
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['user_id'] = self.request.GET.get("user_id", None)
@@ -142,7 +141,7 @@ class WebAppCategoryPage(ListView):
         context['preview'] = self.request.GET.get("preview") == "1"
         context['prev_val'] = self.request.GET.get("preview")
         return context
-    
+
 
 class WebAppDetailPage(DetailView):
     template_name = "single.html"
@@ -172,12 +171,12 @@ class WebAppDetailPage(DetailView):
 
         else:
             queryset = queryset.extra(
-                    select={
-                        'price_uzs': f'price_uzs_a',
-                        'price_usd': f'price_usd_a'
-                    }
-                )
-            
+                select={
+                    'price_uzs': f'price_uzs_a',
+                    'price_usd': f'price_usd_a'
+                }
+            )
+
         cat = self.request.GET.get("cate", None)
         if cat and (not user_id or user_id == "None"):
             queryset = queryset.extra(
@@ -187,7 +186,7 @@ class WebAppDetailPage(DetailView):
                 }
             )
         return queryset
-    
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['user_id'] = self.request.GET.get("user_id", None)
@@ -195,7 +194,6 @@ class WebAppDetailPage(DetailView):
         context['preview'] = self.request.GET.get("preview") == "1"
         context['prev_val'] = self.request.GET.get("preview")
         return context
-
 
 
 class WebAppCartPage(TemplateView):

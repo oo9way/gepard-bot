@@ -152,7 +152,11 @@
                     <div class="col-sm-3 col-3">
                         <a href="{% url "by_category" %}?cat={{category.id}}&user_id={{user_id}}&cate={{cate}}&preview={{prev_val}}" class="link">
                             <div class="cat-cover mb-1">
-                                <img src="{{category.cover.url}}" alt="">
+                                {% if category.cover %}
+                                    <img src="{{category.cover.url}}" alt="">
+                                {% else %}
+                                    <img src="{% static 'assets/png/picture.png' %}" alt="">
+                                {% endif %}
                             </div>
                             <div class="sub-title" style="word-break: break-all !important;">
                                 {{category.title}}
@@ -171,7 +175,11 @@
                     <div class="col-sm-6 p-2 col-6 m-0 p-0">
                         <a href="{% url "detail" product.id %}?user_id={{user_id}}&cate={{cate}}&preview={{prev_val}}" class="link">
                             <div class="cat-cover mb-1">
-                                <img src="{{product.cover.url}}" alt="">
+                                {% if product.cover %}
+                                    <img src="{{product.cover.url}}" alt="">
+                                {% else %}
+                                    <img src="{% static 'assets/png/picture.png' %}" alt="">
+                                {% endif %}
                             </div>
                             <div class="sub-title" style="word-break: break-all !important;">
                                 {{product.title}}
