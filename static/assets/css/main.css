@@ -219,7 +219,7 @@
 
 .modal-content {
     border: none;
-    background-color: #f5f5fa;
+    background-color: #f5f5fa !important;
 }
 
 .modal-body{
