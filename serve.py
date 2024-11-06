@@ -33,12 +33,10 @@ sentry_sdk.init(
     },
 )
 
-
 # Store bot applications in a dictionary
 applications = {}
 
 CHOOSING, TYPING_REPLY = range(2)
-
 
 
 async def choose_option(update, context):
@@ -46,11 +44,13 @@ async def choose_option(update, context):
     await update.message.reply_text(f'You chose: {user_choice}. Now, please type your message:')
     return TYPING_REPLY
 
+
 # Handle user reply
 async def handle_reply(update, context):
     user_message = update.message.text
     await update.message.reply_text(f'You typed: {user_message}. Thank you!')
     return ConversationHandler.END
+
 
 conversation_handler = ConversationHandler(
     entry_points=[
@@ -80,7 +80,7 @@ order_handler = ConversationHandler(
         states.CHOOSE_PAYMENT: [
             CallbackQueryHandler(web.get_payment)
         ],
-        states.CHOOSE_LOCATION:[
+        states.CHOOSE_LOCATION: [
             MessageHandler(filters.ALL, web.get_location)
         ]
     },
@@ -89,6 +89,7 @@ order_handler = ConversationHandler(
     ]
 )
 
+
 async def setup_bot(token: str):
     application = Application.builder().token(token).build()
     application.add_handler(order_handler)
@@ -96,8 +97,8 @@ async def setup_bot(token: str):
     application.add_handler(CommandHandler("category", commands.category))
     application.add_handler(MessageHandler(filters.Text("📞 Связаться с нами"), common.contact))
     application.add_handler(conversation_handler)
-    
-    
+    application.add_handler(MessageHandler(filters.ALL, commands.start))
+
     applications[token] = application
 
     webhook_url = f"{os.environ.get('WEBHOOK')}webhook?token={token}"
@@ -107,7 +108,7 @@ async def setup_bot(token: str):
 @app.on_event("startup")
 async def on_startup():
     bot_tokens = os.environ.get("TOKENS").split(",")
-    
+
     for token in bot_tokens:
         await setup_bot(token)
 
@@ -119,7 +120,6 @@ async def trigger_error():
 
 @app.post("/webhook")
 async def handle_update(request: Request, token: str = Query(...)):
-    print(applications)
     if token not in applications:
         raise HTTPException(status_code=404, detail="Invalid bot token")
 
@@ -129,9 +129,11 @@ async def handle_update(request: Request, token: str = Query(...)):
     update = Update.de_json(data, application.bot)
     await application.initialize()
     await application.process_update(update)
-    
+
     return {"status": "ok"}
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT")))
