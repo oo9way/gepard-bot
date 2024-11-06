@@ -1,15 +1,12 @@
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
-from django.shortcuts import render
 from .models import Order
-import zipfile
-import os
 from PyPDF2 import PdfMerger
 import io
 
+
 def generate_pdf_view(request, pk):
-    # Get the object from the database
     obj = Order.objects.get(pk=pk)
 
     data = {
@@ -34,7 +31,6 @@ def generate_pdf_view(request, pk):
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="object_{obj.id}.pdf"'
     return response
-
 
 
 def generate_pdf2_view(request):
@@ -63,7 +59,7 @@ def generate_pdf2_view(request):
                         "qty": float(item.qty),
                         "price_uzs": float(item.qty) * float(item.price_uzs)
                     },
-                    
+
                 )
                 inserted_items.append(item.product_id)
             else:
@@ -80,8 +76,7 @@ def generate_pdf2_view(request):
                 items.remove(old_item)
             selected_item = next((i for i in items if i["id"] == item.product_id), None)
             nabor = selected_item['qty'] - int(selected_item["set_amount"] * selected_item["product_in_set"])
-            selected_item["case"] = nabor            
-
+            selected_item["case"] = nabor
 
     data = {
         "users": users,
@@ -89,7 +84,6 @@ def generate_pdf2_view(request):
         "total_sum": total_sum,
         "items": items,
     }
-
 
     # Render the HTML template with context data
     html_string = render_to_string('contract2.html', {'data': data})
@@ -141,5 +135,5 @@ def generate_multiple_pdfs_view(request):
     # Create an HTTP response with the merged PDF content
     response = HttpResponse(output_pdf.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="merged_orders.pdf"'
-    
+
     return response

@@ -173,9 +173,13 @@
                 var count = localStorage.getItem('product_' + productId);
                 return count ? parseInt(count, 10) : 0;
             }
-
+            console.log(getItemCount("{{product.id}}"), "ITEM", Number(document.querySelector(".productSetAmount").value));
             document.querySelector(".amountOfProduct").value = getItemCount("{{product.id}}")
-            document.querySelector(".amountOfSet").value = (Number(getItemCount("{{product.id}}")) / Number(document.querySelector(".productSetAmount").value)).toFixed(2)
+            let amountOfSet = (Number(getItemCount("{{product.id}}")) / Number(document.querySelector(".productSetAmount").value)).toFixed(2)
+            if (!isFinite(amountOfSet) || Number.isNaN(amountOfSet)) {
+                amountOfSet = 0
+            }
+            document.querySelector(".amountOfSet").value = amountOfSet;
         })
         </script>
         
@@ -213,6 +217,7 @@
                                 data-item-price-uzs="{{product.price_uzs}}"
                                 data-item-cover="{% static 'assets/png/picture.png' %}"
                                 data-item-set="{{product.set_amount}}"
+                                data-item-amount="{{ product.amount }}"
                                 class="add-cart">+</button>
                         {% endif %}
                     </div>

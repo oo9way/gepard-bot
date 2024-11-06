@@ -2,7 +2,6 @@ from typing import Any
 from django.db.models.query import QuerySet
 from django.views.generic import TemplateView, ListView, DetailView
 from bot.models import Product, Category, TelegramUser
-from django.db.models import Q, F
 
 
 class WebAppTemplateView(ListView):
@@ -146,6 +145,12 @@ class WebAppCategoryPage(ListView):
 class WebAppDetailPage(DetailView):
     template_name = "single.html"
     model = Product
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if int(obj.set_amount) == 0:
+            obj.set_amount = 1
+        return obj
 
     def get_queryset(self) -> QuerySet[Any]:
         user_id = self.request.GET.get("user_id", None)
