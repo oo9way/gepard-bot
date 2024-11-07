@@ -136,6 +136,10 @@
     color: #444;
 }
 
+.brand-logo img {
+    width: 100px;
+}
+
 .header-cart {
     position: relative;
 }
