@@ -35,6 +35,13 @@
             {% if preview %}
             Telegram.WebApp.close();
             {% endif %}
+            
+            var isCommented = document.getElementById('comment').value
+            
+            if (!isCommented){
+                alert("Требуется комментарий");
+                return
+            }
             // Disable the button to prevent multiple clicks while waiting for location
             mainButton.setText('Getting Location...').disable();
     
