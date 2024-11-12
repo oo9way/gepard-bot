@@ -50,6 +50,12 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ("category", "is_active")
     search_fields = ("title",)
 
+    def get_search_results(self, request, queryset, search_term):
+        if search_term:
+            for field in self.search_fields:
+                queryset = queryset.filter(**{f"{field}__icontains": search_term})
+        return queryset, False
+
 
 from bot.resources import UsersTableResourse, OrderResource
 
