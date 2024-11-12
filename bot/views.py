@@ -2,6 +2,7 @@ from typing import Any
 from django.db.models.query import QuerySet
 from django.views.generic import TemplateView, ListView, DetailView
 from bot.models import Product, Category, TelegramUser
+from django.db.models import Q
 
 
 class WebAppTemplateView(ListView):
@@ -15,7 +16,12 @@ class WebAppTemplateView(ListView):
         user_id = self.request.GET.get("user_id", None)
 
         if query:
-            queryset = queryset.filter(title__icontains=query)
+            search_term = str(query).lower()  # Ensure the search term is lowercase
+            queries = [
+                Q(**{f"title__icontains": search_term}) |
+                Q(**{f"title__iregex": f"(?i){search_term}"})
+            ]
+            queryset = queryset.filter(*queries)
 
         if user_id and user_id != "None":
             category = TelegramUser.objects.get(pk=user_id).category
@@ -75,7 +81,13 @@ class WebAppHomePage(ListView):
         queryset = super().get_queryset().filter(is_top=False)
         query = self.request.GET.get('q')
         if query:
-            queryset = queryset.filter(title__icontains=query)
+            search_term = str(query).lower()  # Ensure the search term is lowercase
+            queries = [
+                Q(**{f"title__icontains": search_term}) |
+                Q(**{f"title__iregex": f"(?i){search_term}"})
+            ]
+            print(queries)
+            queryset = queryset.filter(*queries)
         return queryset
 
     def get_context_data(self, **kwargs: Any):
