@@ -20,6 +20,17 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ("title",)
     list_display_links = list_display
 
+    def get_search_results(self, request, queryset, search_term):
+        if search_term:
+            search_term = search_term.lower()  # Ensure the search term is lowercase
+            queries = [
+                Q(**{f"{field}__icontains": search_term}) |
+                Q(**{f"{field}__iregex": f"(?i){search_term}"})  # Using regex for case-insensitive match
+                for field in self.search_fields
+            ]
+            queryset = queryset.filter(*queries)
+        return queryset, False
+
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
@@ -75,6 +86,17 @@ class TelegramUserAdmin(ImportExportModelAdmin):
     skip_export_form = True
     search_fields = ("tin", "first_name", "username", "phone")
     readonly_fields = ("telegram_id", "phone")
+
+    def get_search_results(self, request, queryset, search_term):
+        if search_term:
+            search_term = search_term.lower()  # Ensure the search term is lowercase
+            queries = [
+                Q(**{f"{field}__icontains": search_term}) |
+                Q(**{f"{field}__iregex": f"(?i){search_term}"})  # Using regex for case-insensitive match
+                for field in self.search_fields
+            ]
+            queryset = queryset.filter(*queries)
+        return queryset, False
 
 
 class OrderItemTabularInline(admin.TabularInline):
@@ -375,6 +397,7 @@ class OrderAdmin(ImportExportModelAdmin):
     date_hierarchy = "created_at"
     resource_class = OrderResource
     skip_export_form = True
+    
 
     actions = ['generate_multiple_pdfs', 'generate_pdf2', export_orders_to_excel, export_invoice_total_amount]
 
@@ -534,3 +557,14 @@ class AreaAdmin(admin.ModelAdmin):
     list_display = ("id", "name",)
     search_fields = ("name",)
     list_display_links = list_display
+
+    def get_search_results(self, request, queryset, search_term):
+        if search_term:
+            search_term = search_term.lower()  # Ensure the search term is lowercase
+            queries = [
+                Q(**{f"{field}__icontains": search_term}) |
+                Q(**{f"{field}__iregex": f"(?i){search_term}"})  # Using regex for case-insensitive match
+                for field in self.search_fields
+            ]
+            queryset = queryset.filter(*queries)
+        return queryset, False
