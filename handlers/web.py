@@ -13,9 +13,13 @@ from django.db.models import Q
 #     close_old_connections()
 #     return await sync_to_async(lambda: TelegramUser.objects.filter(territory__in=user.territory.all(), is_agent=False))()
 
-async def fetch_clients(territories):
+async def fetch_clients(territories, search):
     # Wrap the ORM operation with sync_to_async
-    return await sync_to_async(lambda: list(TelegramUser.objects.filter(territory__in=territories, is_agent=False, is_active=True)))()
+    return await sync_to_async(lambda: list(TelegramUser.objects.filter(
+        territory__in=territories, 
+        is_agent=False, 
+        is_active=True, 
+        first_name__icontains=search)))()
 
 @get_user
 async def web_app_data(update: Update, context: CallbackContext, user: TelegramUser) -> None:
@@ -66,7 +70,7 @@ async def web_app_data(update: Update, context: CallbackContext, user: TelegramU
     
     context.user_data["uncompleted_order_id"] = order.pk
     territories = await sync_to_async(user.territory.all)()
-    clients = await fetch_clients(territories)
+    clients = await fetch_clients(territories, search="")
     if not clients:
         message = "Заказ отменен, так как у вас нет клиентов"
         await order.adelete()
@@ -96,20 +100,43 @@ async def web_app_data(update: Update, context: CallbackContext, user: TelegramU
 @get_user
 async def get_agent_client(update, context, user):
     territories = await sync_to_async(user.territory.all)()
-    clients = await fetch_clients(territories)
+    clients = await fetch_clients(territories, search="")
     if not clients:
         message = "У вас нет клиентов"
         await update.message.reply_text(message, reply_markup=replies.get_agent_main())
         return -1
 
-    delete_message = await update.message.reply_text(".", reply_markup=ReplyKeyboardRemove())
-    await delete_message.delete()
+    # delete_message = await update.message.reply_text(".", reply_markup=ReplyKeyboardRemove())
+    # await delete_message.delete()
 
-    message = "Выберите клиента"
-    await update.message.reply_text(message, reply_markup=inlines.get_user_inline_keyboard(clients))
+    # message = "Выберите клиента"
+    message = "Поиск по имени клиента"
+    await update.message.reply_text(message, reply_markup=replies.get_back_ru())
     context.user_data["client_for_order"] = True
 
-    return states.CHOOSE_CLIENT
+    # return states.CHOOSE_CLIENT
+    return states.SEARCH_CLIENT
+
+
+@get_user
+async def get_searched_user(update: Update, context: CallbackContext, user: TelegramUser) -> None:
+    if update.message and update.message.text:
+        if update.message.text == "◀️ Назад":
+            await update.message.reply_text("Главное меню", reply_markup=replies.get_agent_main())
+            return -1
+        message = "Выберите клиента или введите другой поиск"
+        territories = await sync_to_async(user.territory.all)()
+        clients = await fetch_clients(territories, search=update.message.text)
+        if not clients:
+            await update.message.reply_text("Результаты поиска не найдены, попробуйте еще раз", reply_markup=replies.get_back_ru())
+            return states.SEARCH_CLIENT
+
+        await update.message.reply_text(message, reply_markup=inlines.get_user_inline_keyboard(clients))
+        return states.SEARCH_CLIENT
+    
+    elif update.callback_query and update.callback_query.data:
+        return await get_client(update, context)
+        
 
 
 @get_user

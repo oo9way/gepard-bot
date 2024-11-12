@@ -84,3 +84,13 @@ def get_back():
             ]
         ], resize_keyboard=True
     )
+
+
+def get_back_ru():
+    return ReplyKeyboardMarkup(
+        [
+            [
+                KeyboardButton(text="◀️ Назад", )
+            ]
+        ], resize_keyboard=True
+    )

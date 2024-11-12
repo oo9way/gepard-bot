@@ -73,6 +73,10 @@ order_handler = ConversationHandler(
         MessageHandler(filters.Text("Выберите клиента"), web.get_agent_client),
     ],
     states={
+        states.SEARCH_CLIENT: [
+            CallbackQueryHandler(web.get_searched_user),
+            MessageHandler(filters.TEXT, web.get_searched_user)
+        ],
         states.CHOOSE_CLIENT: [
             CallbackQueryHandler(web.get_client),
             MessageHandler(filters.TEXT, web.get_client)
