@@ -116,7 +116,15 @@
       </div>
     </div>
   </div>
+        {% if preview %}
+    <div class="bg-success p-3">
+        
+        <a href="{% url "generate-excel-price" %}?cat={{cate}}" class="text-white" >
+            Yuklab olish
+        </a>
+    </div>
 
+        {% endif %}
     <div class="container mobile-container" style="margin-bottom: 150px !important;">
         <div class="header mb-2 p-4 pb-2">
             <div class="brand-section">
