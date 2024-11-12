@@ -1,10 +1,10 @@
 from functools import wraps
+from pprint import pprint
 
 from asgiref.sync import sync_to_async
 from telegram import Update
 
 from bot.models import TelegramUser
-
 
 def get_user(handler):
     @wraps(handler)
@@ -60,3 +60,17 @@ def import_data():
         price_uzs_e = str(price_uzs_e).replace(',00', '').replace(' ', '')
         Product.objects.create(title=name, price_uzs_a=price_uzs_a, price_uzs_b=price_uzs_b, price_uzs_c=price_uzs_c,
                                price_uzs_d=price_uzs_d, price_uzs_e=price_uzs_e)
+
+
+def import_client_data():
+    from bot.models import Area
+    area, created = Area.objects.get_or_create(name="Мирзо Улугбек")
+    workbook = load_workbook(filename="clients.xlsx")
+    sheet = workbook.active
+    import random
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        agent_tg_id = random.randint(999, 9999999)
+
+        client, tin, agent = row[:3]
+        u = TelegramUser.objects.create(telegram_id=agent_tg_id, first_name=client, tin=tin)
+        u.territory.add(area)

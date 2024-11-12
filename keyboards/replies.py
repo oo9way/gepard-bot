@@ -5,13 +5,15 @@ load_dotenv()
 
 from telegram import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 
+
 def get_main(user_id=None):
     return ReplyKeyboardMarkup(
         [
             [
                 KeyboardButton(
                     text="🛍 Продукты",
-                    web_app=WebAppInfo(url=os.environ.get("WEBAPP") + f"?user_id={user_id}" if user_id else os.environ.get("WEBAPP")),
+                    web_app=WebAppInfo(
+                        url=os.environ.get("WEBAPP") + f"?user_id={user_id}" if user_id else os.environ.get("WEBAPP")),
                 )
             ],
             [
@@ -24,6 +26,7 @@ def get_main(user_id=None):
         ],
         resize_keyboard=True,
     )
+
 
 def get_agent_main():
     return ReplyKeyboardMarkup(
@@ -44,6 +47,7 @@ def get_agent_main():
         resize_keyboard=True,
     )
 
+
 def get_location():
     return ReplyKeyboardMarkup(
         [
@@ -58,12 +62,12 @@ def get_location():
     )
 
 
-
 def get_settings():
     return ReplyKeyboardMarkup(
         [
             [
-                KeyboardButton(text="🪪 Ism va Familiyani tahrirlash"), KeyboardButton(text="📞 Telefon raqamni tahrirlash")
+                KeyboardButton(text="🪪 Ism va Familiyani tahrirlash"),
+                KeyboardButton(text="📞 Telefon raqamni tahrirlash")
             ],
             [
                 KeyboardButton(text="◀️ Ortga qaytish")
