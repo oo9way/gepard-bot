@@ -31,7 +31,7 @@ async def generate_excel_file(cat):
     sheet.append(headers)
 
     for product in products:
-        sheet.append([product.get("id"), product.get("name"), product.get("price_uzs")])
+        sheet.append([product.get("id"), product.get("title"), product.get("price_uzs")])
 
     # Save the workbook to a temporary file
     file_path = os.path.join(settings.BASE_DIR, "products.xlsx")
