@@ -52,8 +52,13 @@ class ProductAdmin(admin.ModelAdmin):
 
     def get_search_results(self, request, queryset, search_term):
         if search_term:
-            for field in self.search_fields:
-                queryset = queryset.filter(**{f"{field}__icontains": search_term})
+            search_term = search_term.lower()  # Ensure the search term is lowercase
+            queries = [
+                Q(**{f"{field}__icontains": search_term}) |
+                Q(**{f"{field}__iregex": f"(?i){search_term}"})  # Using regex for case-insensitive match
+                for field in self.search_fields
+            ]
+            queryset = queryset.filter(*queries)
         return queryset, False
 
 
