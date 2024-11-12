@@ -13,7 +13,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 
 from utils import get_user
-from handlers import commands, common, parameters, web
+from handlers import commands, common, parameters, web, excel
 import states
 
 app = FastAPI()
@@ -98,11 +98,13 @@ async def setup_bot(token: str):
     application.add_handler(MessageHandler(filters.Text("📞 Связаться с нами"), common.contact))
     application.add_handler(conversation_handler)
     application.add_handler(MessageHandler(filters.ALL, commands.start))
+    application.add_handler(CallbackQueryHandler(excel.send_excel))
 
     applications[token] = application
 
     webhook_url = f"{os.environ.get('WEBHOOK')}webhook?token={token}"
-    # await application.bot.set_webhook(url=webhook_url)
+    print(webhook_url)
+    await application.bot.set_webhook(url=webhook_url)
 
 
 @app.on_event("startup")
