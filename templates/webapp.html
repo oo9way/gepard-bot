@@ -153,7 +153,7 @@
             <div class="row mt-2">
                 {% for category in categories %}
                     <div class="col-sm-3 col-3">
-                        <a href="{% url "by_category" %}?cat={{category.id}}&user_id={{user_id}}&cate={{cate}}&preview={{prev_val}}" class="link">
+                        <a href='{% url "by_category" %}?cat={{category.id}}&user_id={{user_id}}&cate={{cate}}&preview={{prev_val}}' class="link">
                             <div class="cat-cover mb-1">
                                 {% if category.cover %}
                                     <img src="{{category.cover.url}}" alt="">
