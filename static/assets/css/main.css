@@ -137,7 +137,9 @@
 }
 
 .brand-logo img {
-    width: 32px;
+    height: 100px;
+    width: 100%;
+    object-fit: cover;
 }
 
 .header-cart {
